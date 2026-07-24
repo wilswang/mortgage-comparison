@@ -339,7 +339,7 @@
 		<p class="sub">整理自「大亮泊建案」12 家銀行對保 DM 原始掃描件，逐頁核對後修正錯誤、補齊漏收方案。這版新增：每個方案的貸款成數可獨立調整（預設為 DM 標示的最大可貸成數）、方案比較卡片可展開逐期還款明細、可另外加入信貸／裝潢貸一併試算月付總額。</p>
 		
 		<div class="urgent">
-			<b>時效性提醒：</b>新青安 2.0 將於 2026/7/31 截止申請，2026/8/1 起改為青安 3.0，新增「未滿50歲」「本人年所得200萬以下」「房屋總價上限（台北市3500萬/新北竹2500萬/其他2000萬）」等資格限制。若你不是這幾天送件，請直接跟受理銀行確認你適用的是哪個版本、資格是否符合，不要照搬本表第一列的舊版數字。
+			<b>時效性提醒：</b>表格第一列已改為青安 3.0（2026/8/1~2029/7/31適用），數字來源是行政院／財政部官方公告，不是銀行DM——因為DM是舊版2.0時期做的，各銀行還沒發3.0的新版文宣。如果你是在2026/7/31前已經送件，適用的仍是舊版2.0（利率公式相同，但沒有未滿50歲、年所得200萬以下、房屋總價上限這些新增資格限制），請跟受理銀行確認你屬於哪個版本。
 		</div>
 		
 		<div class="disclaimer">
@@ -465,8 +465,7 @@
 
 <script>
 	const bankData = [
-		{ id:"youth_taiwan", bank:"公股銀行聯合(臺銀/一銀/合庫/彰銀)", name:"青年安心成家專案(2.0，7/31前送件適用)", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"依各承作銀行規範，約最高8成", fee:"開辦費按核貸金額千分之1計收，最低5,000元（以臺灣銀行條件為準，各承作銀行費用略有差異）", penalty:"多數配合銀行不綁約，可提前還本免違約金", asOf:"112.08.01-115.07.31補貼期", rec:false, youthStepUp:true, conditions:"本人配偶及未成年子女均無自有住宅。注意：2026/8/1起改為青安3.0，新增未滿50歲、本人年所得200萬以下、房屋總價上限(北市3500萬/新北竹2500萬/其他2000萬)等資格限制，7/31前送件才適用本列2.0規則。" },
-		{ id:"changhwa_youth_step", bank:"彰化銀行", name:"青年首次購屋優惠貸款(階段式)", rate1:2.065, rate1Years:2, rate2:2.365, grace:5, term:40, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範，無寬限期", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償全部或部分還款，不收取違約金", asOf:"115.05.05", rec:false, conditions:"第1~2年2.065%起，第3年起2.365%起。利息補貼0.5%至115/7/31止（補貼期間最低1.565%起）。與台銀等公股行版本(1.775%/2.275%)是不同計算路徑，實際送件以受理銀行公告為準。" },
+		{ id:"youth_30", bank:"公股銀行（臺銀/一銀/合庫/彰銀等）", name:"青年安心成家購屋優惠貸款3.0（2026/8/1起適用）", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"最高8成", fee:"依各承作銀行規範，3.0確切開辦費用待各行正式公告，暫沿用2.0時期臺灣銀行標準（千分之1，最低5,000元）試算", penalty:"多數配合銀行不綁約，可提前還本免違約金（沿用2.0慣例，3.0確切規定待公告）", asOf:"行政院115.07.16會議通過公告／財政部說明，非個別銀行DM", rec:false, youthStepUp:true, conditions:"申辦期間2026/8/1~2029/7/31。資格：借款人申貸時未滿50歲，且申貸年齡+核貸年限≤80；借款人本人年所得總額≤200萬元；房屋總價依縣市分級上限（台北市3,500萬／新北市及新竹縣市2,500萬／其他縣市2,000萬）；一生限貸一次；本人配偶及未成年子女均無自有住宅。一般首購最高貸1,000萬，新婚2年內家庭最高1,200萬，育有未成年子女最高1,500萬。利息補貼採「3+3」機制：前3年優惠後利率1.775%，第4年起每年減碼半碼，第7年起回復原貸款利率2.275%（與2.0機制相同）。3.0已取消二段式機動利率與混合式固定利率選項，僅保留一段式機動利率。此列資料來源為行政院／財政部官方公告，銀行DM是2.0時期製作、尚未更新，實際承作銀行清單與各項費用請以正式上路後各行公告為準。" },
 		
 		{ id:"taiwan_pub_first", bank:"臺灣銀行", name:"築巢優利貸(公教首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:5, term:40, ltvMax:85, ltvNote:"最高8.5成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購(含與他人共購)，名下無自用住宅。" },
 		{ id:"taiwan_pub_nonfirst", bank:"臺灣銀行", name:"築巢優利貸(公教非首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購，名下有房無貸款，無寬限期。" },
@@ -589,6 +588,30 @@
 		return phases;
 	}
 	
+	function buildCombinedPhases(mortgageRows, loans) {
+		let phases = [];
+		mortgageRows.forEach(row => {
+			const loanPayment = loans.reduce((sum, l) => {
+				const loanMonths = l.years * 12;
+				return sum + (row.month <= loanMonths ? calcLoanPayment(l.amount, l.rate, l.years) : 0);
+			}, 0);
+			const combined = row.payment + loanPayment;
+			const phaseDesc = row.isGrace ? `寬限期（房貸只繳利息）` : `房貸本息平均攤還`;
+			const last = phases[phases.length - 1];
+			const samePhase = last &&
+				last.rate === row.rate &&
+				last.isGrace === row.isGrace &&
+				Math.abs(last.mortgagePayment - row.payment) <= 5 &&
+				Math.abs(last.loanPayment - loanPayment) <= 5;
+			if (!samePhase) {
+				phases.push({ startMonth: row.month, endMonth: row.month, mortgagePayment: row.payment, loanPayment, combined, rate: row.rate, isGrace: row.isGrace, desc: phaseDesc });
+			} else {
+				last.endMonth = row.month;
+			}
+		});
+		return phases;
+	}
+	
 	function calcLoanPayment(amountWan, ratePct, years) {
 		const P = amountWan * 10000;
 		const r = ratePct / 100 / 12;
@@ -684,20 +707,49 @@
 	}
 	
 	function renderPhaseDetailInto(container, plan, res) {
-		const phases = buildPhases(res.rows);
-		let phaseHtml = phases.map(ph => {
-			const sy = Math.floor((ph.startMonth - 1) / 12) + 1;
-			const ey = Math.ceil(ph.endMonth / 12);
-			const periodLabel = ph.startMonth === ph.endMonth ? `第 ${ph.startMonth} 期` : `第 ${ph.startMonth}~${ph.endMonth} 期`;
-			const yearLabel = sy === ey ? `約第 ${sy} 年` : `約第 ${sy}~${ey} 年`;
-			return `<tr>
-      <td>${periodLabel}</td>
-      <td>${yearLabel}</td>
-      <td class="desc">${ph.desc}</td>
-      <td>${ph.rate}%</td>
-      <td>${fmt(ph.payment)} 元</td>
-    </tr>`;
-		}).join('');
+		const loans = loansForBank(plan.bank);
+		const hasLoans = loans.length > 0;
+		const phases = hasLoans ? buildCombinedPhases(res.rows, loans) : buildPhases(res.rows);
+		
+		let phaseHtml, headHtml;
+		if (hasLoans) {
+			headHtml = `<th>期別</th><th>約當年度</th><th>房貸還款方式</th><th>利率</th><th>房貸月付</th><th>信貸月付</th><th>合計月付</th>`;
+			phaseHtml = phases.map(ph => {
+				const sy = Math.floor((ph.startMonth - 1) / 12) + 1;
+				const ey = Math.ceil(ph.endMonth / 12);
+				const periodLabel = ph.startMonth === ph.endMonth ? `第 ${ph.startMonth} 期` : `第 ${ph.startMonth}~${ph.endMonth} 期`;
+				const yearLabel = sy === ey ? `約第 ${sy} 年` : `約第 ${sy}~${ey} 年`;
+				return `<tr>
+        <td>${periodLabel}</td>
+        <td>${yearLabel}</td>
+        <td class="desc">${ph.desc}</td>
+        <td>${ph.rate}%</td>
+        <td>${fmt(ph.mortgagePayment)} 元</td>
+        <td>${ph.loanPayment > 0 ? fmt(ph.loanPayment) + ' 元' : '已繳清'}</td>
+        <td><b>${fmt(ph.combined)} 元</b></td>
+      </tr>`;
+			}).join('');
+		} else {
+			headHtml = `<th>期別</th><th>約當年度</th><th>還款方式</th><th>利率</th><th>每期金額</th>`;
+			phaseHtml = phases.map(ph => {
+				const sy = Math.floor((ph.startMonth - 1) / 12) + 1;
+				const ey = Math.ceil(ph.endMonth / 12);
+				const periodLabel = ph.startMonth === ph.endMonth ? `第 ${ph.startMonth} 期` : `第 ${ph.startMonth}~${ph.endMonth} 期`;
+				const yearLabel = sy === ey ? `約第 ${sy} 年` : `約第 ${sy}~${ey} 年`;
+				return `<tr>
+        <td>${periodLabel}</td>
+        <td>${yearLabel}</td>
+        <td class="desc">${ph.desc}</td>
+        <td>${ph.rate}%</td>
+        <td>${fmt(ph.payment)} 元</td>
+      </tr>`;
+			}).join('');
+		}
+		
+		const loanNote = hasLoans
+			? `<div class="ltv-default" style="margin-bottom:10px;">已合併綁定信貸：${loans.map(l => `${l.name}（${l.years}年，繳完後信貸月付歸零）`).join('、')}</div>`
+			: '';
+		
 		container.innerHTML = `
     <div class="detail-summary">
       <div class="item">貸款金額<b>${fmt(res.P)} 元</b></div>
@@ -706,9 +758,10 @@
       <div class="item">累計總利息<b>${fmt(res.totalInterest)} 元</b></div>
       <div class="item">總還款金額<b>${fmt(res.totalPayment)} 元</b></div>
     </div>
+    ${loanNote}
     <div style="overflow-x:auto;">
       <table class="phase-table">
-        <thead><tr><th>期別</th><th>約當年度</th><th>還款方式</th><th>利率</th><th>每期金額</th></tr></thead>
+        <thead><tr>${headHtml}</tr></thead>
         <tbody>${phaseHtml}</tbody>
       </table>
     </div>
@@ -753,11 +806,24 @@
 	function downloadCSV(id) {
 		const plan = bankData.find(p => p.id === id);
 		const res = getPlanResult(plan);
-		let csv = '\uFEFF期別,年度,利率(%),還款方式,每期還款金額,本金,利息,累計利息,剩餘本金\n';
-		res.rows.forEach(r => {
-			const year = Math.ceil(r.month / 12);
-			csv += `${r.month},第${year}年,${r.rate},${r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還'},${Math.round(r.payment)},${Math.round(r.principal)},${Math.round(r.interest)},${Math.round(r.accInterest)},${Math.round(r.balance)}\n`;
-		});
+		const loans = loansForBank(plan.bank);
+		const hasLoans = loans.length > 0;
+		let csv;
+		if (hasLoans) {
+			csv = '\uFEFF期別,年度,利率(%),房貸還款方式,房貸月付,本金,利息,累計利息,剩餘本金,信貸月付,合計月付\n';
+			res.rows.forEach(r => {
+				const year = Math.ceil(r.month / 12);
+				const loanPayment = loans.reduce((sum, l) => sum + (r.month <= l.years * 12 ? calcLoanPayment(l.amount, l.rate, l.years) : 0), 0);
+				const combined = r.payment + loanPayment;
+				csv += `${r.month},第${year}年,${r.rate},${r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還'},${Math.round(r.payment)},${Math.round(r.principal)},${Math.round(r.interest)},${Math.round(r.accInterest)},${Math.round(r.balance)},${Math.round(loanPayment)},${Math.round(combined)}\n`;
+			});
+		} else {
+			csv = '\uFEFF期別,年度,利率(%),還款方式,每期還款金額,本金,利息,累計利息,剩餘本金\n';
+			res.rows.forEach(r => {
+				const year = Math.ceil(r.month / 12);
+				csv += `${r.month},第${year}年,${r.rate},${r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還'},${Math.round(r.payment)},${Math.round(r.principal)},${Math.round(r.interest)},${Math.round(r.accInterest)},${Math.round(r.balance)}\n`;
+			});
+		}
 		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
