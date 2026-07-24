@@ -161,9 +161,14 @@
 		}
 		.rate-inputs{display:flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;}
 		.rate-inputs input{
-			width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
+			width:56px;padding:5px 4px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:center;
 			background:var(--bg);color:var(--ink);
+			-moz-appearance:textfield;
+		}
+		.rate-inputs input::-webkit-outer-spin-button,
+		.rate-inputs input::-webkit-inner-spin-button{
+			-webkit-appearance:none;margin:0;
 		}
 		.rate-inputs input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
 		.rate-arrow{color:var(--ink-faint);font-size:11px;}
