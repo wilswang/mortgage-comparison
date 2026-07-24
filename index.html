@@ -83,6 +83,19 @@
 			font-size:12.5px;
 			color:var(--accent-dark);
 		}
+		.youth-info{
+			margin-top:12px;
+			background:var(--accent-soft);
+			border:1px solid #B9D8CD;
+			border-radius:var(--radius);
+			padding:14px 18px;
+			font-size:13px;
+			color:var(--accent-dark);
+		}
+		.youth-info b{color:var(--accent-dark);}
+		.youth-info ul{margin:8px 0 0;padding-left:20px;}
+		.youth-info li{margin-bottom:5px;line-height:1.6;}
+		.youth-info li:last-child{margin-bottom:0;}
 		
 		.panel{
 			background:var(--surface);
@@ -173,14 +186,14 @@
 		.rate-inputs input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
 		.rate-arrow{color:var(--ink-faint);font-size:11px;}
 		.small-input{
-			width:44px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-			font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:right;
+			width:56px;padding:5px 4px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:center;
 			background:var(--bg);color:var(--ink);
 		}
 		.small-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
 		.ltv-input{
-			width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
+			width:56px;padding:5px 4px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:center;
 			background:var(--bg);color:var(--ink);
 		}
 		.ltv-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
@@ -232,7 +245,7 @@
 		.loan-add-form select{
 			font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:400;
 			border:1px solid var(--line);border-radius:8px;padding:8px 10px;
-			background:var(--bg);color:var(--ink);width:190px;
+			background:var(--bg);color:var(--ink);width:280px;
 		}
 		.loan-bank-badge{
 			display:inline-flex;align-items:center;
@@ -345,6 +358,18 @@
 		
 		<div class="urgent">
 			<b>時效性提醒：</b>表格第一列已改為青安 3.0（2026/8/1~2029/7/31適用），數字來源是行政院／財政部官方公告，不是銀行DM——因為DM是舊版2.0時期做的，各銀行還沒發3.0的新版文宣。如果你是在2026/7/31前已經送件，適用的仍是舊版2.0（利率公式相同，但沒有未滿50歲、年所得200萬以下、房屋總價上限這些新增資格限制），請跟受理銀行確認你屬於哪個版本。
+		</div>
+		
+		<div class="youth-info">
+			<b>青年安心成家購屋優惠貸款 3.0 方案說明</b>（2026/8/1~2029/7/31 適用）
+			<ul>
+				<li>資格門檻：借款人申貸時未滿 50 歲，且「申貸年齡＋核貸年限」≤80；借款人本人年所得總額≤200 萬元；本人、配偶及未成年子女均無自有住宅；一生限貸一次。</li>
+				<li>房屋總價上限：台北市 3,500 萬／新北市及新竹縣市 2,500 萬／其他縣市 2,000 萬。</li>
+				<li>貸款額度：一般首購最高 1,000 萬，新婚 2 年內家庭最高 1,200 萬，育有未成年子女最高 1,500 萬。</li>
+				<li>利息補貼採「3+3」機制：前 3 年優惠後利率 1.775%，第 4 年起每年減碼半碼，第 7 年起回復原貸款利率 2.275%（與 2.0 機制相同）。</li>
+				<li>3.0 已取消二段式機動利率與混合式固定利率選項，僅保留一段式機動利率。寬限期維持最長 5 年、貸款成數最高 8 成、貸款年限最長 40 年。</li>
+				<li>資料來源：行政院 115.07.16 會議通過公告／財政部說明，屬官方政策公告，非個別銀行 DM——各銀行的 DM 仍是 2.0 時期製作、尚未更新，實際承作銀行清單與各項費用（開辦費、違約金等）請以正式上路後各行公告為準。</li>
+			</ul>
 		</div>
 		
 		<div class="disclaimer">
@@ -473,7 +498,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 	const bankData = [
-		{ id:"youth_30", bank:"公股銀行（臺銀/一銀/合庫/彰銀等）", name:"青年安心成家購屋優惠貸款3.0（2026/8/1起適用）", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"最高8成", fee:"依各承作銀行規範，3.0確切開辦費用待各行正式公告，暫沿用2.0時期臺灣銀行標準（千分之1，最低5,000元）試算", penalty:"多數配合銀行不綁約，可提前還本免違約金（沿用2.0慣例，3.0確切規定待公告）", asOf:"行政院115.07.16會議通過公告／財政部說明，非個別銀行DM", rec:false, youthStepUp:true, conditions:"申辦期間2026/8/1~2029/7/31。資格：借款人申貸時未滿50歲，且申貸年齡+核貸年限≤80；借款人本人年所得總額≤200萬元；房屋總價依縣市分級上限（台北市3,500萬／新北市及新竹縣市2,500萬／其他縣市2,000萬）；一生限貸一次；本人配偶及未成年子女均無自有住宅。一般首購最高貸1,000萬，新婚2年內家庭最高1,200萬，育有未成年子女最高1,500萬。利息補貼採「3+3」機制：前3年優惠後利率1.775%，第4年起每年減碼半碼，第7年起回復原貸款利率2.275%（與2.0機制相同）。3.0已取消二段式機動利率與混合式固定利率選項，僅保留一段式機動利率。此列資料來源為行政院／財政部官方公告，銀行DM是2.0時期製作、尚未更新，實際承作銀行清單與各項費用請以正式上路後各行公告為準。" },
+		{ id:"youth_30", bank:"公股銀行（臺銀/一銀/合庫/彰銀等）", name:"青年安心成家購屋優惠貸款3.0（2026/8/1起適用）", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"最高8成", fee:"依各承作銀行規範，3.0確切開辦費用待各行正式公告，暫沿用2.0時期臺灣銀行標準（千分之1，最低5,000元）試算", penalty:"多數配合銀行不綁約，可提前還本免違約金（沿用2.0慣例，3.0確切規定待公告）", asOf:"行政院115.07.16會議通過公告／財政部說明，非個別銀行DM", rec:false, youthStepUp:true, conditions:"詳細資格門檻、利息補貼機制與注意事項，請參考頁面最上方「青安3.0方案說明」。" },
 		
 		{ id:"taiwan_pub_first", bank:"臺灣銀行", name:"築巢優利貸(公教首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:5, term:40, ltvMax:85, ltvNote:"最高8.5成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購(含與他人共購)，名下無自用住宅。" },
 		{ id:"taiwan_pub_nonfirst", bank:"臺灣銀行", name:"築巢優利貸(公教非首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購，名下有房無貸款，無寬限期。" },
@@ -940,16 +965,27 @@
 		XLSX.writeFile(wb, `房貸方案比較_${selected.length}個方案.xlsx`);
 	}
 	
+	function clampValue(raw, min, max, decimals) {
+		let v = parseFloat(raw);
+		if (isNaN(v)) v = min;
+		v = Math.min(max, Math.max(min, v));
+		const factor = Math.pow(10, decimals);
+		v = Math.round(v * factor) / factor;
+		return v;
+	}
+	
+	function updateRowDisplay(id) {
+		const plan = bankData.find(p => p.id === id);
+		const res = getPlanResult(plan);
+		const firstEl = document.getElementById('firstpay-' + id);
+		const postEl = document.getElementById('postpay-' + id);
+		const loanAmtEl = document.getElementById('loanamt-' + id);
+		if (firstEl) firstEl.textContent = fmt(res.firstPayment);
+		if (postEl) postEl.textContent = res.postGracePayment !== res.firstPayment ? fmt(res.postGracePayment) : '—';
+		if (loanAmtEl) loanAmtEl.textContent = `貸款約 ${fmt(res.P / 10000)} 萬`;
+	}
+	
 	function renderTable() {
-		const active = document.activeElement;
-		let focusInfo = null;
-		if (active && active.tagName === 'INPUT' && active.dataset && active.dataset.id) {
-			const cls = [...active.classList].find(c => c.endsWith('-input'));
-			if (cls) {
-				focusInfo = { className: cls, id: active.dataset.id, selStart: active.selectionStart, selEnd: active.selectionEnd };
-			}
-		}
-		
 		const body = document.getElementById('planBody');
 		body.innerHTML = '';
 		bankData.forEach(plan => {
@@ -965,21 +1001,21 @@
       </td>
       <td>
         <div class="rate-inputs">
-          <input type="number" step="0.01" class="rate1-input" data-id="${plan.id}" value="${s.rate1}">
-          ${plan.rate1Years < plan.term ? `<span class="rate-arrow">→</span><input type="number" step="0.01" class="rate2-input" data-id="${plan.id}" value="${s.rate2}">` : (plan.youthStepUp ? '<span class="rate-arrow">階梯</span>' : '')}
+          <input type="number" min="0" max="100" step="0.001" class="rate1-input" data-id="${plan.id}" value="${s.rate1}">
+          ${plan.rate1Years < plan.term ? `<span class="rate-arrow">→</span><input type="number" min="0" max="100" step="0.001" class="rate2-input" data-id="${plan.id}" value="${s.rate2}">` : (plan.youthStepUp ? '<span class="rate-arrow">階梯</span>' : '')}
         </div>
       </td>
       <td>
         <div class="ltv-cell">
-          <input type="number" class="ltv-input" data-id="${plan.id}" value="${s.ltv}" min="0" max="100" step="1">
-          <span class="loan-amt">貸款約 ${fmt(res.P / 10000)} 萬</span>
+          <input type="number" min="0" max="100" step="1" class="ltv-input" data-id="${plan.id}" value="${s.ltv}">
+          <span class="loan-amt" id="loanamt-${plan.id}">貸款約 ${fmt(res.P / 10000)} 萬</span>
           <span class="ltv-default">DM：${plan.ltvNote}</span>
         </div>
       </td>
-      <td><input type="number" class="small-input term-input" data-id="${plan.id}" value="${s.term}"></td>
-      <td><input type="number" class="small-input grace-input" data-id="${plan.id}" value="${s.grace}"></td>
-      <td class="num">${fmt(res.firstPayment)}</td>
-      <td class="num">${res.postGracePayment !== res.firstPayment ? fmt(res.postGracePayment) : '—'}</td>
+      <td><input type="number" min="1" max="80" step="1" class="small-input term-input" data-id="${plan.id}" value="${s.term}"></td>
+      <td><input type="number" min="0" max="10" step="1" class="small-input grace-input" data-id="${plan.id}" value="${s.grace}"></td>
+      <td class="num" id="firstpay-${plan.id}">${fmt(res.firstPayment)}</td>
+      <td class="num" id="postpay-${plan.id}">${res.postGracePayment !== res.firstPayment ? fmt(res.postGracePayment) : '—'}</td>
       <td class="meta-text"><b>費用：</b>${plan.fee}<br><b>違約金：</b>${plan.penalty}<br><b>基準日：</b>${plan.asOf}</td>
       <td class="cond">${plan.conditions}</td>
       <td><button class="detail-btn" data-id="${plan.id}" onclick="toggleDetail('${plan.id}')">查看逐期</button></td>
@@ -1001,20 +1037,31 @@
 				renderCompare();
 			});
 		});
-		document.querySelectorAll('.rate1-input').forEach(el => {
-			el.addEventListener('input', e => { state[e.target.dataset.id].rate1 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-		});
-		document.querySelectorAll('.rate2-input').forEach(el => {
-			el.addEventListener('input', e => { state[e.target.dataset.id].rate2 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-		});
-		document.querySelectorAll('.ltv-input').forEach(el => {
-			el.addEventListener('input', e => { state[e.target.dataset.id].ltv = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-		});
-		document.querySelectorAll('.term-input').forEach(el => {
-			el.addEventListener('input', e => { state[e.target.dataset.id].term = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-		});
-		document.querySelectorAll('.grace-input').forEach(el => {
-			el.addEventListener('input', e => { state[e.target.dataset.id].grace = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		
+		const fieldSpecs = [
+			{ cls: 'rate1-input', key: 'rate1', min: 0, max: 100, decimals: 3 },
+			{ cls: 'rate2-input', key: 'rate2', min: 0, max: 100, decimals: 3 },
+			{ cls: 'ltv-input', key: 'ltv', min: 0, max: 100, decimals: 0 },
+			{ cls: 'term-input', key: 'term', min: 1, max: 80, decimals: 0 },
+			{ cls: 'grace-input', key: 'grace', min: 0, max: 10, decimals: 0 }
+		];
+		fieldSpecs.forEach(spec => {
+			document.querySelectorAll(`.${spec.cls}`).forEach(el => {
+				el.addEventListener('input', e => {
+					const id = e.target.dataset.id;
+					state[id][spec.key] = clampValue(e.target.value, spec.min, spec.max, spec.decimals);
+					updateRowDisplay(id);
+					renderCompare();
+				});
+				el.addEventListener('change', e => {
+					const id = e.target.dataset.id;
+					const clean = clampValue(e.target.value, spec.min, spec.max, spec.decimals);
+					state[id][spec.key] = clean;
+					e.target.value = clean;
+					updateRowDisplay(id);
+					renderCompare();
+				});
+			});
 		});
 		
 		Object.keys(openDetails).forEach(id => {
@@ -1028,16 +1075,6 @@
 				}
 			}
 		});
-		
-		if (focusInfo) {
-			const newEl = document.querySelector(`.${focusInfo.className}[data-id="${focusInfo.id}"]`);
-			if (newEl) {
-				newEl.focus();
-				if (typeof focusInfo.selStart === 'number') {
-					try { newEl.setSelectionRange(focusInfo.selStart, focusInfo.selEnd); } catch (e) {}
-				}
-			}
-		}
 	}
 	
 	function renderCompare() {
