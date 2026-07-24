@@ -1,668 +1,704 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>房貸方案比較工具</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg:#F4F5F1;
-    --surface:#FFFFFF;
-    --ink:#1C2321;
-    --ink-soft:#5B655E;
-    --ink-faint:#8A928B;
-    --line:#DCE0D8;
-    --line-soft:#EAECE6;
-    --accent:#0B5D52;
-    --accent-soft:#E4F0EC;
-    --accent-dark:#073F38;
-    --gold:#A9792C;
-    --gold-soft:#F5EDDB;
-    --best:#1F7A5C;
-    --best-soft:#E1F3EA;
-    --warn:#A9432E;
-    --warn-soft:#FBEAE5;
-    --radius:10px;
-  }
-  *{box-sizing:border-box;}
-  body{
-    margin:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Noto Sans TC', sans-serif;
-    line-height:1.6;
-    padding:32px 20px 80px;
-  }
-  .wrap{max-width:1360px;margin:0 auto;}
-
-  header{margin-bottom:28px;border-bottom:1px solid var(--line);padding-bottom:24px;}
-  .eyebrow{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
-    letter-spacing:.08em;
-    color:var(--accent);
-    text-transform:uppercase;
-    margin-bottom:8px;
-  }
-  h1{
-    font-family:'Noto Serif TC', serif;
-    font-weight:700;
-    font-size:30px;
-    margin:0 0 8px;
-    color:var(--ink);
-  }
-  .sub{color:var(--ink-soft);font-size:14.5px;max-width:800px;}
-  .disclaimer{
-    margin-top:16px;
-    background:var(--gold-soft);
-    border:1px solid #E4D3A6;
-    border-radius:var(--radius);
-    padding:12px 16px;
-    font-size:13px;
-    color:#5C4517;
-  }
-  .disclaimer b{color:#4A3710;}
-  .urgent{
-    margin-top:12px;
-    background:var(--warn-soft);
-    border:1px solid #E3B4A6;
-    border-radius:var(--radius);
-    padding:12px 16px;
-    font-size:13px;
-    color:#6E2A19;
-  }
-  .urgent b{color:#5A2013;}
-  .verify-tag{
-    margin-top:12px;
-    background:var(--accent-soft);
-    border:1px solid #B9D8CD;
-    border-radius:var(--radius);
-    padding:12px 16px;
-    font-size:12.5px;
-    color:var(--accent-dark);
-  }
-
-  .panel{
-    background:var(--surface);
-    border:1px solid var(--line);
-    border-radius:12px;
-    padding:20px 22px;
-    margin-bottom:24px;
-  }
-  .panel h2{
-    font-family:'Noto Serif TC', serif;
-    font-size:17px;
-    margin:0 0 14px;
-    font-weight:700;
-    display:flex;align-items:center;gap:8px;
-  }
-  .panel h2 small{font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:400;color:var(--ink-faint);}
-  .stamp{
-    display:inline-flex;align-items:center;justify-content:center;
-    width:20px;height:20px;border-radius:50%;
-    border:1.5px solid var(--gold);color:var(--gold);
-    font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;
-    flex-shrink:0;
-  }
-
-  .controls{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;}
-  .field{display:flex;flex-direction:column;gap:5px;}
-  .field label{font-size:12.5px;color:var(--ink-soft);}
-  .field input{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:15px;
-    font-weight:600;
-    border:1px solid var(--line);
-    border-radius:8px;
-    padding:8px 10px;
-    width:130px;
-    background:var(--bg);
-    color:var(--ink);
-  }
-  .field input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-  .field small{color:var(--ink-faint);font-size:11px;}
-  .toggle-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);}
-
-  .table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);}
-  table{border-collapse:collapse;width:100%;min-width:1380px;font-size:13px;}
-  thead th{
-    text-align:left;
-    font-size:11px;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:.03em;
-    padding:12px 9px;
-    border-bottom:1px solid var(--line);
-    background:var(--line-soft);
-    position:sticky;top:0;
-  }
-  tbody td{padding:9px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
-  tbody tr:hover{background:var(--accent-soft);}
-  tbody tr.selected{background:var(--best-soft);}
-  .bank-name{font-weight:700;color:var(--ink);font-size:13.5px;}
-  .plan-name{color:var(--ink-soft);font-size:12px;margin-top:1px;}
-  .rec-badge{
-    display:inline-flex;align-items:center;gap:4px;
-    background:var(--gold-soft);color:#6B4E13;
-    border:1px solid #E4D3A6;
-    font-size:10.5px;font-weight:700;
-    padding:1px 7px;border-radius:20px;
-    margin-left:5px;
-  }
-  .new-badge{
-    display:inline-flex;align-items:center;gap:4px;
-    background:var(--warn-soft);color:#6E2A19;
-    border:1px solid #E3B4A6;
-    font-size:10px;font-weight:700;
-    padding:1px 6px;border-radius:20px;
-    margin-left:5px;
-  }
-  .rate-inputs{display:flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;}
-  .rate-inputs input{
-    width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-    font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
-    background:var(--bg);color:var(--ink);
-  }
-  .rate-inputs input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-  .rate-arrow{color:var(--ink-faint);font-size:11px;}
-  .small-input{
-    width:44px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-    font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:right;
-    background:var(--bg);color:var(--ink);
-  }
-  .small-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-  .ltv-input{
-    width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
-    font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
-    background:var(--bg);color:var(--ink);
-  }
-  .ltv-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
-  .ltv-cell{display:flex;flex-direction:column;gap:3px;}
-  .ltv-cell .loan-amt{font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;}
-  .ltv-cell .ltv-default{font-size:10px;color:var(--ink-faint);}
-  .num{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;}
-  .meta-text{font-size:11px;color:var(--ink-faint);line-height:1.6;}
-  .meta-text b{color:var(--ink-soft);font-weight:600;}
-  .cond{font-size:11px;color:var(--ink-faint);max-width:200px;line-height:1.5;}
-  input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
-
-  .detail-btn{
-    font-family:'Noto Sans TC',sans-serif;
-    font-size:11.5px;font-weight:600;
-    background:var(--accent-soft);color:var(--accent-dark);
-    border:1px solid #B9D8CD;border-radius:6px;
-    padding:6px 10px;cursor:pointer;white-space:nowrap;
-  }
-  .detail-btn:hover{background:#D3E7DF;}
-  .detail-row td{background:var(--bg);padding:16px 18px;}
-  .phase-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px;}
-  .phase-table th{text-align:left;font-size:11px;color:var(--ink-soft);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line);}
-  .phase-table td{padding:6px 8px;border-bottom:1px solid var(--line-soft);font-family:'IBM Plex Mono',monospace;}
-  .phase-table td.desc{font-family:'Noto Sans TC',sans-serif;}
-  .detail-summary{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;font-size:12.5px;}
-  .detail-summary .item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;}
-  .detail-summary .item b{display:block;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);margin-top:2px;}
-  .csv-btn{
-    font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:600;
-    background:var(--surface);color:var(--ink-soft);
-    border:1px solid var(--line);border-radius:6px;
-    padding:6px 12px;cursor:pointer;
-  }
-  .csv-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
-
-  .loan-add-form{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:16px;}
-  .loan-add-form input{
-    font-family:'IBM Plex Mono', monospace;font-size:14px;font-weight:600;
-    border:1px solid var(--line);border-radius:8px;padding:8px 10px;
-    background:var(--bg);color:var(--ink);
-  }
-  .loan-add-form input#loanName{font-family:'Noto Sans TC',sans-serif;font-weight:400;width:140px;}
-  .loan-add-form input[type=number]{width:100px;}
-  .add-btn{
-    background:var(--accent);color:#fff;border:none;border-radius:8px;
-    padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  }
-  .add-btn:hover{background:var(--accent-dark);}
-  .loan-list{display:flex;flex-direction:column;gap:8px;}
-  .loan-item{
-    display:flex;align-items:center;justify-content:space-between;gap:12px;
-    background:var(--bg);border:1px solid var(--line);border-radius:8px;
-    padding:10px 14px;font-size:13px;
-  }
-  .loan-item .li-name{font-weight:700;min-width:110px;}
-  .loan-item .li-detail{color:var(--ink-soft);font-size:12px;flex:1;}
-  .loan-item .li-payment{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent-dark);}
-  .del-btn{
-    background:none;border:1px solid var(--warn);color:var(--warn);
-    border-radius:6px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
-  }
-  .del-btn:hover{background:var(--warn-soft);}
-  .loan-total{
-    margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
-    display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;
-  }
-  .loan-total b{font-family:'IBM Plex Mono',monospace;color:var(--accent-dark);font-size:17px;}
-
-  .compare-bar{
-    position:sticky;bottom:16px;
-    display:flex;align-items:center;justify-content:space-between;
-    background:var(--ink);color:#fff;
-    border-radius:12px;padding:12px 20px;
-    margin-top:16px;
-    font-size:14px;
-    box-shadow:0 6px 20px rgba(0,0,0,.15);
-  }
-  .compare-bar span{color:#B9C2BC;}
-  .compare-bar b{color:#fff;}
-
-  .compare-section{margin-top:28px;}
-  .compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:18px;}
-  .compare-card{
-    background:var(--surface);border:1px solid var(--line);border-radius:12px;
-    padding:16px 18px;position:relative;
-  }
-  .compare-card.best{border:2px solid var(--best);}
-  .compare-card .tag{
-    position:absolute;top:-10px;right:14px;
-    background:var(--best);color:#fff;font-size:11px;font-weight:700;
-    padding:3px 10px;border-radius:20px;
-  }
-  .compare-card h3{font-family:'Noto Serif TC',serif;font-size:15px;margin:0 0 2px;}
-  .compare-card .plan{font-size:12px;color:var(--ink-soft);margin-bottom:12px;}
-  .metric-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13px;gap:10px;}
-  .metric-row:last-child{border-bottom:none;}
-  .metric-row span:first-child{color:var(--ink-soft);flex-shrink:0;}
-  .metric-row span:last-child{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;}
-  .metric-row.combo{background:var(--accent-soft);margin:8px -18px 0;padding:8px 18px;border-bottom:none;}
-  .metric-row.combo span{color:var(--accent-dark);font-weight:700;}
-  .card-detail-btn{
-    width:100%;margin-top:10px;
-    font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:600;
-    background:var(--bg);color:var(--ink-soft);
-    border:1px solid var(--line);border-radius:8px;
-    padding:8px;cursor:pointer;
-  }
-  .card-detail-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
-  .card-detail-content{margin-top:10px;}
-
-  .ruler-wrap{margin:20px 0 26px;}
-  .ruler-label{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
-  .ruler{position:relative;height:44px;background:var(--line-soft);border-radius:8px;margin:0 6px;}
-  .ruler-pin{
-    position:absolute;top:-2px;transform:translateX(-50%);
-    display:flex;flex-direction:column;align-items:center;
-  }
-  .ruler-pin .dot{
-    width:14px;height:14px;border-radius:50%;background:var(--accent);
-    border:2px solid #fff;box-shadow:0 0 0 1px var(--accent);
-  }
-  .ruler-pin .lbl{
-    font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;
-    margin-top:26px;color:var(--ink-soft);white-space:nowrap;
-  }
-  .ruler-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);margin-top:4px;padding:0 6px;font-family:'IBM Plex Mono',monospace;}
-
-  .bar-compare{margin-top:22px;}
-  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-  .bar-row .name{width:170px;font-size:12.5px;color:var(--ink-soft);flex-shrink:0;text-align:right;}
-  .bar-track{flex:1;background:var(--line-soft);border-radius:6px;height:22px;position:relative;overflow:hidden;}
-  .bar-fill{height:100%;background:var(--accent);border-radius:6px;display:flex;align-items:center;}
-  .bar-fill.best{background:var(--best);}
-  .bar-val{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#fff;padding-left:8px;white-space:nowrap;}
-
-  .empty-hint{color:var(--ink-faint);font-size:13.5px;text-align:center;padding:30px 0;}
-
-  footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-faint);}
-</style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>房貸方案比較工具</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Noto+Sans+TC:wght@400;500;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+	<style>
+		:root{
+			--bg:#F4F5F1;
+			--surface:#FFFFFF;
+			--ink:#1C2321;
+			--ink-soft:#5B655E;
+			--ink-faint:#8A928B;
+			--line:#DCE0D8;
+			--line-soft:#EAECE6;
+			--accent:#0B5D52;
+			--accent-soft:#E4F0EC;
+			--accent-dark:#073F38;
+			--gold:#A9792C;
+			--gold-soft:#F5EDDB;
+			--best:#1F7A5C;
+			--best-soft:#E1F3EA;
+			--warn:#A9432E;
+			--warn-soft:#FBEAE5;
+			--radius:10px;
+		}
+		*{box-sizing:border-box;}
+		body{
+			margin:0;
+			background:var(--bg);
+			color:var(--ink);
+			font-family:'Noto Sans TC', sans-serif;
+			line-height:1.6;
+			padding:32px 20px 80px;
+		}
+		.wrap{max-width:1360px;margin:0 auto;}
+		
+		header{margin-bottom:28px;border-bottom:1px solid var(--line);padding-bottom:24px;}
+		.eyebrow{
+			font-family:'IBM Plex Mono', monospace;
+			font-size:12px;
+			letter-spacing:.08em;
+			color:var(--accent);
+			text-transform:uppercase;
+			margin-bottom:8px;
+		}
+		h1{
+			font-family:'Noto Serif TC', serif;
+			font-weight:700;
+			font-size:30px;
+			margin:0 0 8px;
+			color:var(--ink);
+		}
+		.sub{color:var(--ink-soft);font-size:14.5px;max-width:800px;}
+		.disclaimer{
+			margin-top:16px;
+			background:var(--gold-soft);
+			border:1px solid #E4D3A6;
+			border-radius:var(--radius);
+			padding:12px 16px;
+			font-size:13px;
+			color:#5C4517;
+		}
+		.disclaimer b{color:#4A3710;}
+		.urgent{
+			margin-top:12px;
+			background:var(--warn-soft);
+			border:1px solid #E3B4A6;
+			border-radius:var(--radius);
+			padding:12px 16px;
+			font-size:13px;
+			color:#6E2A19;
+		}
+		.urgent b{color:#5A2013;}
+		.verify-tag{
+			margin-top:12px;
+			background:var(--accent-soft);
+			border:1px solid #B9D8CD;
+			border-radius:var(--radius);
+			padding:12px 16px;
+			font-size:12.5px;
+			color:var(--accent-dark);
+		}
+		
+		.panel{
+			background:var(--surface);
+			border:1px solid var(--line);
+			border-radius:12px;
+			padding:20px 22px;
+			margin-bottom:24px;
+		}
+		.panel h2{
+			font-family:'Noto Serif TC', serif;
+			font-size:17px;
+			margin:0 0 14px;
+			font-weight:700;
+			display:flex;align-items:center;gap:8px;
+		}
+		.panel h2 small{font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:400;color:var(--ink-faint);}
+		.stamp{
+			display:inline-flex;align-items:center;justify-content:center;
+			width:20px;height:20px;border-radius:50%;
+			border:1.5px solid var(--gold);color:var(--gold);
+			font-size:11px;font-weight:700;font-family:'IBM Plex Mono',monospace;
+			flex-shrink:0;
+		}
+		
+		.controls{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-end;}
+		.field{display:flex;flex-direction:column;gap:5px;}
+		.field label{font-size:12.5px;color:var(--ink-soft);}
+		.field input{
+			font-family:'IBM Plex Mono', monospace;
+			font-size:15px;
+			font-weight:600;
+			border:1px solid var(--line);
+			border-radius:8px;
+			padding:8px 10px;
+			width:130px;
+			background:var(--bg);
+			color:var(--ink);
+		}
+		.field input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+		.field small{color:var(--ink-faint);font-size:11px;}
+		.toggle-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);}
+		
+		.table-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);}
+		table{border-collapse:collapse;width:100%;min-width:1380px;font-size:13px;}
+		thead th{
+			text-align:left;
+			font-size:11px;
+			color:var(--ink-soft);
+			text-transform:uppercase;
+			letter-spacing:.03em;
+			padding:12px 9px;
+			border-bottom:1px solid var(--line);
+			background:var(--line-soft);
+			position:sticky;top:0;
+		}
+		tbody td{padding:9px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
+		tbody tr:hover{background:var(--accent-soft);}
+		tbody tr.selected{background:var(--best-soft);}
+		.bank-name{font-weight:700;color:var(--ink);font-size:13.5px;}
+		.plan-name{color:var(--ink-soft);font-size:12px;margin-top:1px;}
+		.rec-badge{
+			display:inline-flex;align-items:center;gap:4px;
+			background:var(--gold-soft);color:#6B4E13;
+			border:1px solid #E4D3A6;
+			font-size:10.5px;font-weight:700;
+			padding:1px 7px;border-radius:20px;
+			margin-left:5px;
+		}
+		.new-badge{
+			display:inline-flex;align-items:center;gap:4px;
+			background:var(--warn-soft);color:#6E2A19;
+			border:1px solid #E3B4A6;
+			font-size:10px;font-weight:700;
+			padding:1px 6px;border-radius:20px;
+			margin-left:5px;
+		}
+		.rate-inputs{display:flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;}
+		.rate-inputs input{
+			width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
+			background:var(--bg);color:var(--ink);
+		}
+		.rate-inputs input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+		.rate-arrow{color:var(--ink-faint);font-size:11px;}
+		.small-input{
+			width:44px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:right;
+			background:var(--bg);color:var(--ink);
+		}
+		.small-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+		.ltv-input{
+			width:50px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;
+			font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600;text-align:right;
+			background:var(--bg);color:var(--ink);
+		}
+		.ltv-input:focus{outline:none;border-color:var(--accent);background:var(--surface);}
+		.ltv-cell{display:flex;flex-direction:column;gap:3px;}
+		.ltv-cell .loan-amt{font-size:10.5px;color:var(--ink-faint);font-family:'IBM Plex Mono',monospace;}
+		.ltv-cell .ltv-default{font-size:10px;color:var(--ink-faint);}
+		.num{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;}
+		.meta-text{font-size:11px;color:var(--ink-faint);line-height:1.6;}
+		.meta-text b{color:var(--ink-soft);font-weight:600;}
+		.cond{font-size:11px;color:var(--ink-faint);max-width:200px;line-height:1.5;}
+		input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent);cursor:pointer;}
+		
+		.detail-btn{
+			font-family:'Noto Sans TC',sans-serif;
+			font-size:11.5px;font-weight:600;
+			background:var(--accent-soft);color:var(--accent-dark);
+			border:1px solid #B9D8CD;border-radius:6px;
+			padding:6px 10px;cursor:pointer;white-space:nowrap;
+		}
+		.detail-btn:hover{background:#D3E7DF;}
+		.detail-row td{background:var(--bg);padding:16px 18px;}
+		.phase-table{width:100%;border-collapse:collapse;font-size:12.5px;margin-bottom:10px;}
+		.phase-table th{text-align:left;font-size:11px;color:var(--ink-soft);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line);}
+		.phase-table td{padding:6px 8px;border-bottom:1px solid var(--line-soft);font-family:'IBM Plex Mono',monospace;}
+		.phase-table td.desc{font-family:'Noto Sans TC',sans-serif;}
+		.detail-summary{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:12px;font-size:12.5px;}
+		.detail-summary .item{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px 12px;}
+		.detail-summary .item b{display:block;font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--ink);margin-top:2px;}
+		.csv-btn{
+			font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:600;
+			background:var(--surface);color:var(--ink-soft);
+			border:1px solid var(--line);border-radius:6px;
+			padding:6px 12px;cursor:pointer;
+		}
+		.csv-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+		
+		.loan-add-form{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-end;margin-bottom:16px;}
+		.loan-add-form input{
+			font-family:'IBM Plex Mono', monospace;font-size:14px;font-weight:600;
+			border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+			background:var(--bg);color:var(--ink);
+		}
+		.loan-add-form input#loanName{font-family:'Noto Sans TC',sans-serif;font-weight:400;width:140px;}
+		.loan-add-form input[type=number]{width:100px;}
+		.loan-add-form input,
+		.loan-add-form select{
+			height:38px;box-sizing:border-box;
+		}
+		.loan-add-form select{
+			font-family:'Noto Sans TC',sans-serif;font-size:13px;font-weight:400;
+			border:1px solid var(--line);border-radius:8px;padding:8px 10px;
+			background:var(--bg);color:var(--ink);width:190px;
+		}
+		.loan-bank-badge{
+			display:inline-flex;align-items:center;
+			background:var(--accent-soft);color:var(--accent-dark);
+			border:1px solid #B9D8CD;font-size:10.5px;font-weight:600;
+			padding:2px 8px;border-radius:20px;margin-left:6px;white-space:nowrap;
+		}
+		.add-btn{
+			background:var(--accent);color:#fff;border:none;border-radius:8px;
+			padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+		}
+		.add-btn:hover{background:var(--accent-dark);}
+		.loan-list{display:flex;flex-direction:column;gap:8px;}
+		.loan-item{
+			display:flex;align-items:center;justify-content:space-between;gap:12px;
+			background:var(--bg);border:1px solid var(--line);border-radius:8px;
+			padding:10px 14px;font-size:13px;
+		}
+		.loan-item .li-name{font-weight:700;min-width:110px;}
+		.loan-item .li-detail{color:var(--ink-soft);font-size:12px;flex:1;}
+		.loan-item .li-payment{font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--accent-dark);}
+		.del-btn{
+			background:none;border:1px solid var(--warn);color:var(--warn);
+			border-radius:6px;padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;
+		}
+		.del-btn:hover{background:var(--warn-soft);}
+		.loan-total{
+			margin-top:14px;padding-top:14px;border-top:1px solid var(--line);
+			display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;
+		}
+		.loan-total b{font-family:'IBM Plex Mono',monospace;color:var(--accent-dark);font-size:17px;}
+		
+		.compare-bar{
+			display:flex;align-items:center;justify-content:space-between;
+			background:var(--ink);color:#fff;
+			border-radius:12px;padding:12px 20px;
+			margin-top:16px;
+			font-size:14px;
+		}
+		.compare-bar span{color:#B9C2BC;}
+		.compare-bar b{color:#fff;}
+		
+		.compare-section{margin-top:28px;}
+		.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:18px;}
+		.compare-card{
+			background:var(--surface);border:1px solid var(--line);border-radius:12px;
+			padding:16px 18px;position:relative;
+		}
+		.compare-card.best{border:2px solid var(--best);}
+		.compare-card .tag{
+			position:absolute;top:-10px;right:14px;
+			background:var(--best);color:#fff;font-size:11px;font-weight:700;
+			padding:3px 10px;border-radius:20px;
+		}
+		.compare-card h3{font-family:'Noto Serif TC',serif;font-size:15px;margin:0 0 2px;}
+		.compare-card .plan{font-size:12px;color:var(--ink-soft);margin-bottom:12px;}
+		.metric-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line-soft);font-size:13px;gap:10px;}
+		.metric-row:last-child{border-bottom:none;}
+		.metric-row span:first-child{color:var(--ink-soft);flex-shrink:0;}
+		.metric-row span:last-child{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right;}
+		.metric-row.combo{background:var(--accent-soft);margin:8px -18px 0;padding:8px 18px;border-bottom:none;}
+		.metric-row.combo span{color:var(--accent-dark);font-weight:700;}
+		.card-detail-btn{
+			width:100%;margin-top:10px;
+			font-family:'Noto Sans TC',sans-serif;font-size:12px;font-weight:600;
+			background:var(--bg);color:var(--ink-soft);
+			border:1px solid var(--line);border-radius:8px;
+			padding:8px;cursor:pointer;
+		}
+		.card-detail-btn:hover{border-color:var(--accent);color:var(--accent-dark);}
+		.card-detail-content{margin-top:10px;}
+		
+		.ruler-wrap{margin:20px 0 26px;}
+		.ruler-label{font-size:12px;color:var(--ink-soft);margin-bottom:8px;}
+		.ruler{position:relative;height:44px;background:var(--line-soft);border-radius:8px;margin:0 6px;}
+		.ruler-pin{
+			position:absolute;top:-2px;transform:translateX(-50%);
+			display:flex;flex-direction:column;align-items:center;
+		}
+		.ruler-pin .dot{
+			width:14px;height:14px;border-radius:50%;background:var(--accent);
+			border:2px solid #fff;box-shadow:0 0 0 1px var(--accent);
+		}
+		.ruler-pin .lbl{
+			font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;
+			margin-top:26px;color:var(--ink-soft);white-space:nowrap;
+		}
+		.ruler-ends{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-faint);margin-top:4px;padding:0 6px;font-family:'IBM Plex Mono',monospace;}
+		
+		.bar-compare{margin-top:22px;}
+		.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+		.bar-row .name{width:170px;font-size:12.5px;color:var(--ink-soft);flex-shrink:0;text-align:right;}
+		.bar-track{flex:1;background:var(--line-soft);border-radius:6px;height:22px;position:relative;overflow:hidden;}
+		.bar-fill{height:100%;background:var(--accent);border-radius:6px;display:flex;align-items:center;}
+		.bar-fill.best{background:var(--best);}
+		.bar-val{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#fff;padding-left:8px;white-space:nowrap;}
+		
+		.empty-hint{color:var(--ink-faint);font-size:13.5px;text-align:center;padding:30px 0;}
+		
+		footer{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--ink-faint);}
+	</style>
 </head>
 <body>
 <div class="wrap">
-
-  <header>
-    <div class="eyebrow">Mortgage rate comparison — verified edition v3</div>
-    <h1>房貸方案比較工具（可調成數＋合併信貸試算版）</h1>
-    <p class="sub">整理自「大亮泊建案」12 家銀行對保 DM 原始掃描件，逐頁核對後修正錯誤、補齊漏收方案。這版新增：每個方案的貸款成數可獨立調整（預設為 DM 標示的最大可貸成數）、方案比較卡片可展開逐期還款明細、可另外加入信貸／裝潢貸一併試算月付總額。</p>
-
-    <div class="urgent">
-      <b>時效性提醒：</b>新青安 2.0 將於 2026/7/31 截止申請，2026/8/1 起改為青安 3.0，新增「未滿50歲」「本人年所得200萬以下」「房屋總價上限（台北市3500萬/新北竹2500萬/其他2000萬）」等資格限制。若你不是這幾天送件，請直接跟受理銀行確認你適用的是哪個版本、資格是否符合，不要照搬本表第一列的舊版數字。
-    </div>
-
-    <div class="disclaimer">
-      <b>使用前請注意：</b>表內利率是特定新成屋建案與銀行團體議定的優惠專案，一般市場購屋不一定能拿到相同條件。多數方案標示為「起」，代表最低門檻利率；成數也是「最高」上限，實際核貸利率與成數需依銀行審核你的收入、信用、資產狀況而定，且多數銀行是「鑑價、買價孰低」認定，本工具的預設成數採 DM 標示的較高數字試算，實際可能更保守。房貸多為機動利率，會隨各行定儲利率指數週期性調整，此處僅以 DM 標示當時的牌告數字試算。
-    </div>
-
-    <div class="verify-tag">
-      已對照原始 PDF 逐頁核對並修正資料誤植、補齊遺漏方案（詳見前次比對紀錄）。台中銀行的指標利率基準日為 113 年 4 月（已逾 2 年），數字很可能已過時，請務必再次跟行員確認目前實際牌告利率。
-    </div>
-  </header>
-
-  <div class="panel">
-    <h2><span class="stamp">試</span>試算條件</h2>
-    <div class="controls">
-      <div class="field">
-        <label>房屋總價（萬元）</label>
-        <input type="number" id="housePrice" value="1000" min="1" step="10">
-        <small>各方案貸款金額 = 房屋總價 × 成數</small>
-      </div>
-      <div class="field">
-        <label>統一年限（選填）</label>
-        <input type="number" id="overrideTerm" placeholder="沿用各方案">
-        <small>留空＝各方案用自己的預設年限</small>
-      </div>
-      <div class="field">
-        <label>統一寬限期（選填）</label>
-        <input type="number" id="overrideGrace" placeholder="沿用各方案">
-        <small>留空＝各方案用自己的預設寬限期</small>
-      </div>
-      <div class="toggle-row">
-        <input type="checkbox" id="applyOverride">
-        <label for="applyOverride">套用統一年限／寬限期到全部方案</label>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2><span class="stamp">貸</span>加碼試算：信貸／裝潢貸 <small>（選填，會合併進下方比較卡片的月付總額）</small></h2>
-    <div class="loan-add-form">
-      <div class="field">
-        <label>名稱</label>
-        <input type="text" id="loanName" placeholder="例如：裝潢貸">
-      </div>
-      <div class="field">
-        <label>金額（萬元）</label>
-        <input type="number" id="loanAmt" value="100" min="1" step="10">
-      </div>
-      <div class="field">
-        <label>年利率（%）</label>
-        <input type="number" id="loanRate" value="4.5" min="0" step="0.01">
-      </div>
-      <div class="field">
-        <label>年限（年）</label>
-        <input type="number" id="loanTerm" value="7" min="1" step="1">
-      </div>
-      <button class="add-btn" onclick="addPersonalLoan()">新增這筆貸款</button>
-    </div>
-    <div class="loan-list" id="loanList"></div>
-    <div class="loan-total" id="loanTotalWrap" style="display:none;">
-      <span>信貸／裝潢貸月付合計</span>
-      <b id="loanTotalVal">0 元</b>
-    </div>
-  </div>
-
-  <div class="panel">
-    <h2><span class="stamp">案</span>銀行方案清單（利率、成數皆可直接編輯，紅色「新」標示原表遺漏後新補上的方案）</h2>
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr>
-            <th>比較</th>
-            <th>銀行 / 方案</th>
-            <th>利率（%）</th>
-            <th>成數（%）</th>
-            <th>年限</th>
-            <th>寬限期</th>
-            <th>首期月付</th>
-            <th>後期月付</th>
-            <th>費用 / 違約金 / 基準日</th>
-            <th>條件備註</th>
-            <th>明細</th>
-          </tr>
-        </thead>
-        <tbody id="planBody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="compare-bar" id="compareBar" style="display:none;">
-    <span>已選 <b id="selCount">0</b> 個方案加入比較</span>
-    <span id="compareHint">最多建議選 5 個以內，畫面較清楚</span>
-  </div>
-
-  <div class="compare-section" id="compareSection" style="display:none;">
-    <div class="panel">
-      <h2><span class="stamp">比</span>方案比較</h2>
-
-      <div class="ruler-wrap">
-        <div class="ruler-label">起始利率分布（在全部方案的利率區間中的位置）</div>
-        <div class="ruler" id="rateRuler"></div>
-        <div class="ruler-ends" id="rulerEnds"></div>
-      </div>
-
-      <div class="compare-grid" id="compareGrid"></div>
-
-      <div class="bar-compare">
-        <div class="ruler-label" style="margin-bottom:14px;">總利息比較（貸款期間內累計利息，未含開辦費等一次性費用與信貸）</div>
-        <div id="interestBars"></div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    利率資料來源：大亮泊建案對保銀行 DM（12 家銀行，13 頁掃描件）。此頁面由 Claude 逐頁核對原始 PDF 後製作，僅供試算參考，實際核貸條件、成數與利率以各銀行審核結果與最新公告為準。信貸／裝潢貸試算為標準本息平均攤還公式，實際核貸利率、額度依銀行審核為準。
-  </footer>
+	
+	<header>
+		<div class="eyebrow">Mortgage rate comparison — verified edition v3</div>
+		<h1>房貸方案比較工具（可調成數＋合併信貸試算版）</h1>
+		<p class="sub">整理自「大亮泊建案」12 家銀行對保 DM 原始掃描件，逐頁核對後修正錯誤、補齊漏收方案。這版新增：每個方案的貸款成數可獨立調整（預設為 DM 標示的最大可貸成數）、方案比較卡片可展開逐期還款明細、可另外加入信貸／裝潢貸一併試算月付總額。</p>
+		
+		<div class="urgent">
+			<b>時效性提醒：</b>新青安 2.0 將於 2026/7/31 截止申請，2026/8/1 起改為青安 3.0，新增「未滿50歲」「本人年所得200萬以下」「房屋總價上限（台北市3500萬/新北竹2500萬/其他2000萬）」等資格限制。若你不是這幾天送件，請直接跟受理銀行確認你適用的是哪個版本、資格是否符合，不要照搬本表第一列的舊版數字。
+		</div>
+		
+		<div class="disclaimer">
+			<b>使用前請注意：</b>表內利率是特定新成屋建案與銀行團體議定的優惠專案，一般市場購屋不一定能拿到相同條件。多數方案標示為「起」，代表最低門檻利率；成數也是「最高」上限，實際核貸利率與成數需依銀行審核你的收入、信用、資產狀況而定，且多數銀行是「鑑價、買價孰低」認定，本工具的預設成數採 DM 標示的較高數字試算，實際可能更保守。房貸多為機動利率，會隨各行定儲利率指數週期性調整，此處僅以 DM 標示當時的牌告數字試算。
+		</div>
+		
+		<div class="verify-tag">
+			已對照原始 PDF 逐頁核對並修正資料誤植、補齊遺漏方案（詳見前次比對紀錄）。台中銀行的指標利率基準日為 113 年 4 月（已逾 2 年），數字很可能已過時，請務必再次跟行員確認目前實際牌告利率。
+		</div>
+	</header>
+	
+	<div class="panel">
+		<h2><span class="stamp">試</span>試算條件</h2>
+		<div class="controls">
+			<div class="field">
+				<label>房屋總價（萬元）</label>
+				<input type="number" id="housePrice" value="1000" min="1" step="10">
+				<small>各方案貸款金額 = 房屋總價 × 成數</small>
+			</div>
+			<div class="field">
+				<label>統一年限（選填）</label>
+				<input type="number" id="overrideTerm" placeholder="沿用各方案">
+				<small>留空＝各方案用自己的預設年限</small>
+			</div>
+			<div class="field">
+				<label>統一寬限期（選填）</label>
+				<input type="number" id="overrideGrace" placeholder="沿用各方案">
+				<small>留空＝各方案用自己的預設寬限期</small>
+			</div>
+			<div class="toggle-row">
+				<input type="checkbox" id="applyOverride">
+				<label for="applyOverride">套用統一年限／寬限期到全部方案</label>
+			</div>
+		</div>
+	</div>
+	
+	<div class="panel">
+		<h2><span class="stamp">貸</span>加碼試算：信貸／裝潢貸 <small>（選填，可綁定特定銀行，只會加到該銀行的房貸方案上）</small></h2>
+		<div class="loan-add-form">
+			<div class="field">
+				<label>名稱</label>
+				<input type="text" id="loanName" placeholder="例如：合庫信貸">
+			</div>
+			<div class="field">
+				<label>金額（萬元）</label>
+				<input type="number" id="loanAmt" value="100" min="1" step="10">
+			</div>
+			<div class="field">
+				<label>年利率（%）</label>
+				<input type="number" id="loanRate" value="4.5" min="0" step="0.01">
+			</div>
+			<div class="field">
+				<label>年限（年）</label>
+				<input type="number" id="loanTerm" value="7" min="1" step="1">
+			</div>
+			<div class="field">
+				<label>綁定銀行</label>
+				<select id="loanBank"></select>
+				<small>選「不限定」會套用到所有比較方案</small>
+			</div>
+			<button class="add-btn" onclick="addPersonalLoan()">新增這筆貸款</button>
+		</div>
+		<div class="loan-list" id="loanList"></div>
+		<div class="loan-total" id="loanTotalWrap" style="display:none;">
+			<span>不限定銀行的信貸月付合計 <small style="font-weight:400;color:var(--ink-faint);">（綁定特定銀行的信貸，實際加總請看下方各方案比較卡片）</small></span>
+			<b id="loanTotalVal">0 元</b>
+		</div>
+	</div>
+	
+	<div class="panel">
+		<h2><span class="stamp">案</span>銀行方案清單（利率、成數皆可直接編輯，紅色「新」標示原表遺漏後新補上的方案）</h2>
+		<div class="table-scroll">
+			<table>
+				<thead>
+				<tr>
+					<th>比較</th>
+					<th>銀行 / 方案</th>
+					<th>利率（%）</th>
+					<th>成數（%）</th>
+					<th>年限</th>
+					<th>寬限期</th>
+					<th>首期月付</th>
+					<th>後期月付</th>
+					<th>費用 / 違約金 / 基準日</th>
+					<th>條件備註</th>
+					<th>明細</th>
+				</tr>
+				</thead>
+				<tbody id="planBody"></tbody>
+			</table>
+		</div>
+	</div>
+	
+	<div class="compare-bar" id="compareBar" style="display:none;">
+		<span>已選 <b id="selCount">0</b> 個方案加入比較</span>
+		<span id="compareHint">最多建議選 5 個以內，畫面較清楚</span>
+	</div>
+	
+	<div class="compare-section" id="compareSection" style="display:none;">
+		<div class="panel">
+			<h2><span class="stamp">比</span>方案比較</h2>
+			
+			<div class="ruler-wrap">
+				<div class="ruler-label">起始利率分布（在全部方案的利率區間中的位置）</div>
+				<div class="ruler" id="rateRuler"></div>
+				<div class="ruler-ends" id="rulerEnds"></div>
+			</div>
+			
+			<div class="compare-grid" id="compareGrid"></div>
+			
+			<div class="bar-compare">
+				<div class="ruler-label" style="margin-bottom:14px;">總利息比較（貸款期間內累計利息，未含開辦費等一次性費用與信貸）</div>
+				<div id="interestBars"></div>
+			</div>
+		</div>
+	</div>
+	
+	<footer>
+		利率資料來源：大亮泊建案對保銀行 DM（12 家銀行，13 頁掃描件）。此頁面由 Claude 逐頁核對原始 PDF 後製作，僅供試算參考，實際核貸條件、成數與利率以各銀行審核結果與最新公告為準。信貸／裝潢貸試算為標準本息平均攤還公式，實際核貸利率、額度依銀行審核為準。
+	</footer>
 
 </div>
 
 <script>
-const bankData = [
-  { id:"youth_taiwan", bank:"公股銀行聯合(臺銀/一銀/合庫/彰銀)", name:"青年安心成家專案(2.0，7/31前送件適用)", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"依各承作銀行規範，約最高8成", fee:"開辦費按核貸金額千分之1計收，最低5,000元（以臺灣銀行條件為準，各承作銀行費用略有差異）", penalty:"多數配合銀行不綁約，可提前還本免違約金", asOf:"112.08.01-115.07.31補貼期", rec:false, youthStepUp:true, conditions:"本人配偶及未成年子女均無自有住宅。注意：2026/8/1起改為青安3.0，新增未滿50歲、本人年所得200萬以下、房屋總價上限(北市3500萬/新北竹2500萬/其他2000萬)等資格限制，7/31前送件才適用本列2.0規則。" },
-  { id:"changhwa_youth_step", bank:"彰化銀行", name:"青年首次購屋優惠貸款(階段式)", rate1:2.065, rate1Years:2, rate2:2.365, grace:5, term:40, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範，無寬限期", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償全部或部分還款，不收取違約金", asOf:"115.05.05", rec:false, conditions:"第1~2年2.065%起，第3年起2.365%起。利息補貼0.5%至115/7/31止（補貼期間最低1.565%起）。與台銀等公股行版本(1.775%/2.275%)是不同計算路徑，實際送件以受理銀行公告為準。" },
-
-  { id:"taiwan_pub_first", bank:"臺灣銀行", name:"築巢優利貸(公教首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:5, term:40, ltvMax:85, ltvNote:"最高8.5成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購(含與他人共購)，名下無自用住宅。" },
-  { id:"taiwan_pub_nonfirst", bank:"臺灣銀行", name:"築巢優利貸(公教非首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購，名下有房無貸款，無寬限期。" },
-  { id:"taiwan_first", bank:"臺灣銀行", name:"一般首購(名下無自用住宅)", rate1:2.585, rate1Years:40, rate2:2.585, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費每人300元、開辦費千分之1(最低5,000元)", penalty:"不綁約，可額外還本，不計收違約金", asOf:"本行定儲利率指數1.751%", rec:false, conditions:"借款人名下無自有住宅，需「全國財產稅總歸戶財產查詢清單」佐證。" },
-
-  { id:"first_bank_home_qualify", bank:"第一銀行", name:"自用住宅貸款(符合公教/年所得80萬+)", rate1:2.50, rate1Years:40, rate2:2.50, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金，3年後可隨時提前還款免違約金", asOf:"115.04.15", rec:false, conditions:"【修正】原表誤標為「首購專案」，DM實際分類是自用/非自用住宅，非首購/非首購。借戶符合公教資格或年所得80萬(含)以上，或借保戶合計100萬以上。另有40年專案需洽消金專員，DM未載明寬限期年數。" },
-  { id:"first_bank_home_notqualify", bank:"第一銀行", name:"自用住宅貸款(不符合上述資格)", rate1:2.53, rate1Years:40, rate2:2.53, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金，3年後可隨時提前還款免違約金", asOf:"115.04.15", rec:false, conditions:"【新補】原表完全未收錄。不符合公教/年所得資格者適用此較高利率。" },
-  { id:"first_bank_nonhome_qualify", bank:"第一銀行", name:"非自用住宅貸款(符合資格)", rate1:2.65, rate1Years:40, rate2:2.65, grace:0, term:30, ltvMax:80, ltvNote:"最高8成，店舖另計最長20年、利率加0.15%", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金", asOf:"115.04.15", rec:false, conditions:"【修正】原表誤標為「非首購」。借戶符合公教資格或年所得100萬以上，或借保戶合計120萬以上。" },
-  { id:"first_bank_nonhome_notqualify", bank:"第一銀行", name:"非自用住宅貸款(不符合資格)", rate1:2.75, rate1Years:40, rate2:2.75, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金", asOf:"115.04.15", rec:false, conditions:"【新補】原表完全未收錄。不符合公教/年所得資格者適用此較高利率。" },
-
-  { id:"coop_first", bank:"合作金庫", name:"首購戶", rate1:2.50, rate1Years:40, rate2:2.50, grace:3, term:40, ltvMax:80, ltvNote:"報稅所得70萬以上者最高8成，其他最高7成", fee:"開辦費千分之1(最高收取10,000元)、信用查詢費300元/人", penalty:"需綁約3年，3年內塗銷抵押權收提前清償違約金", asOf:"115.06.17", rec:false, conditions:"名下無房且無房貸。" },
-
-  { id:"changhwa_prime_first", bank:"彰化銀行", name:"尊爵方案(首購)", rate1:2.60, rate1Years:40, rate2:2.60, grace:5, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範辦理", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"公教人員或尊爵客戶(會計師/律師/建築師/醫師/保險經紀人/地政士等)、私立學校或上市櫃年所得70萬以上、或借保合計年收入100萬以上。" },
-  { id:"changhwa_prime_nonfirst", bank:"彰化銀行", name:"尊爵方案(非首購)", rate1:2.85, rate1Years:40, rate2:2.85, grace:5, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範辦理", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。同尊爵資格，非首購適用此利率。" },
-  { id:"changhwa_elite_first", bank:"彰化銀行", name:"菁英方案(首購)", rate1:2.70, rate1Years:40, rate2:2.70, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"本行/他行薪轉戶且任職滿一年以上，或借保合計年收入70萬以上。" },
-  { id:"changhwa_elite_nonfirst", bank:"彰化銀行", name:"菁英方案(非首購)", rate1:2.87, rate1Years:40, rate2:2.87, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。同菁英資格，非首購適用此利率。" },
-  { id:"changhwa_basic_first", bank:"彰化銀行", name:"小資方案(首購)", rate1:2.80, rate1Years:40, rate2:2.80, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"非屬上述兩方案之借款人。" },
-  { id:"changhwa_basic_nonfirst", bank:"彰化銀行", name:"小資方案(非首購)", rate1:2.90, rate1Years:40, rate2:2.90, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。非首購適用此利率。" },
-
-  { id:"yuanta_first_80", bank:"元大銀行", name:"首購(年收入80萬以上)", rate1:2.50, rate1Years:30, rate2:2.50, grace:3, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"年收入80萬(含)以上適用。寬限期限首購戶。" },
-  { id:"yuanta_first_50", bank:"元大銀行", name:"首購(年收入50萬以上)", rate1:2.58, rate1Years:30, rate2:2.58, grace:3, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【新補】原表完全未收錄。年收入50萬(含)以上、未達80萬適用。" },
-  { id:"yuanta_nonfirst_80", bank:"元大銀行", name:"非首購(年收入80萬以上)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【修正】原表寬限期誤植為3年。年收入80萬(含)以上。DM寬限期僅限首購戶，非首購應為0年。" },
-  { id:"yuanta_nonfirst_50", bank:"元大銀行", name:"非首購(年收入50萬以上)", rate1:2.68, rate1Years:30, rate2:2.68, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【新補】原表完全未收錄。年收入50萬(含)以上、未達80萬。非首購無寬限期。" },
-
-  { id:"ctbc_first", bank:"中國信託", name:"自用住宅(首購)", rate1:2.50, rate1Years:30, rate2:2.50, grace:3, term:30, ltvMax:85, ltvNote:"最高85成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:true, conditions:"名下無房無貸。成數最高推薦！" },
-  { id:"ctbc_nonfirst", bank:"中國信託", name:"自用住宅(有房無貸)", rate1:2.60, rate1Years:30, rate2:2.60, grace:3, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【修正】原表寬限期誤植為0年。DM寬限期最長3年是「自用住宅專案」共用條件，非僅首購獨有。" },
-  { id:"ctbc_shop", bank:"中國信託", name:"店面/一般事務所", rate1:2.70, rate1Years:20, rate2:2.70, grace:0, term:20, ltvMax:70, ltvNote:"最高7成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。貸款年限最長20年，無寬限期。" },
-  { id:"ctbc_control2", bank:"中國信託", name:"央行管制戶(2房貸款)", rate1:2.70, rate1Years:30, rate2:2.70, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。含本筆已有2戶房貸。" },
-  { id:"ctbc_control3", bank:"中國信託", name:"央行管制戶(3房貸款)", rate1:2.80, rate1Years:30, rate2:2.80, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。含本筆已有3戶以上房貸。" },
-
-  { id:"scsb_general", bank:"上海商銀", name:"一般專案", rate1:2.48, rate1Years:30, rate2:2.48, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(買賣價或估價孰低)", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:true, conditions:"扣除公設面積後坪數<15坪，利率另加0.2%。利率最低推薦！" },
-  { id:"scsb_control1", bank:"上海商銀", name:"央行控管第一戶", rate1:2.52, rate1Years:30, rate2:2.52, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"坪數<15坪另加0.2%。" },
-  { id:"scsb_control2", bank:"上海商銀", name:"央行控管第二戶", rate1:2.575, rate1Years:30, rate2:2.575, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"【新補】原表完全未收錄。成數明顯下降至6成，請留意自備款壓力。" },
-  { id:"scsb_control3", bank:"上海商銀", name:"央行控管第三戶", rate1:2.695, rate1Years:30, rate2:2.695, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"【新補】原表完全未收錄。成數僅3成，多為第三戶(含)以上適用。" },
-
-  { id:"farmer_first", bank:"板橋區農會", name:"首購", rate1:2.52, rate1Years:30, rate2:2.52, grace:3, term:30, ltvMax:80, ltvNote:"最高8成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"DM僅標示「有」寬限期，未載明確切年數，此處採合理估算3年，實際請洽承辦人員確認。" },
-  { id:"farmer_nonfirst", bank:"板橋區農會", name:"非首購(名下有房無貸款)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶最高6成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"無寬限期。" },
-  { id:"farmer_second", bank:"板橋區農會", name:"第二戶", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:80, ltvNote:"央行管制戶最高6成，其餘最高8成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"【新補】原表完全未收錄此選項。" },
-
-  { id:"obank_first", bank:"王道銀行", name:"首購", rate1:2.58, rate1Years:30, rate2:2.58, grace:2, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"登記一般事務所以上利率+0.1%。" },
-  { id:"obank_nonfirst", bank:"王道銀行", name:"非首購(名下有房無貸款)", rate1:2.78, rate1Years:30, rate2:2.78, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"無寬限期。" },
-  { id:"obank_control2", bank:"王道銀行", name:"央行管制戶(購屋貸款第二戶)", rate1:2.88, rate1Years:30, rate2:2.88, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"【新補】原表未收錄。" },
-  { id:"obank_control3", bank:"王道銀行", name:"央行管制戶(購屋貸款第三戶)", rate1:2.98, rate1Years:30, rate2:2.98, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"【新補】原表未收錄。" },
-
-  { id:"taichung_first", bank:"台中銀行", name:"房貸(首購)", rate1:2.68, rate1Years:30, rate2:2.68, grace:3, term:30, ltvMax:75, ltvNote:"最高7.5成", fee:"貸放金額0.15%(最低10,000元)", penalty:"限制清償24個月，前12月1%/13~24月0.8%", asOf:"113.04.21(已逾2年，數字可能過時，務必再次向行員確認)", rec:false, conditions:"借款人名下無自有住宅。" },
-  { id:"taichung_nonfirst", bank:"台中銀行", name:"房貸(非首購)", rate1:3.50, rate1Years:30, rate2:3.50, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"貸放金額0.15%(最低10,000元)", penalty:"限制清償24個月，前12月1%/13~24月0.8%", asOf:"113.04.21(已逾2年，數字可能過時)", rec:false, conditions:"【新補】原表完全未收錄，非首購利率比首購高出0.82個百分點，落差很大，無寬限期。" },
-  { id:"taichung_second_lien", bank:"台中銀行", name:"二順位房貸(本行)", rate1:3.80, rate1Years:15, rate2:3.80, grace:0, term:15, ltvMax:85, ltvNote:"最高8.5成", fee:"最低9,000元", penalty:"限制清償18個月，前6月3%/7~12月2%/13~18月1%", asOf:"113.04.21(已逾2年，數字可能過時)", rec:false, conditions:"【新補】原表完全未收錄，年限僅15年、無寬限期，月付壓力較大。" },
-
-  { id:"entie_easy", bank:"安泰銀行", name:"輕鬆買房圓滿成家", rate1:2.75, rate1Years:30, rate2:2.75, grace:0, term:30, ltvMax:80, ltvNote:"DM未標示成數，暫以8成試算，請洽詢實際核准成數", fee:"總費用範例約3,000元起", penalty:"DM未標示，需洽詢", asOf:"115.06.05", rec:false, conditions:"機動利率依本行月調整房貸利率指數加碼1.01%起。" },
-  { id:"entie_anxin", bank:"安泰銀行", name:"安心入宅時亨運泰", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:80, ltvNote:"DM未標示成數，暫以8成試算，請洽詢實際核准成數", fee:"總費用範例約3,000元起", penalty:"DM未標示，需洽詢", asOf:"115.06.05", rec:false, conditions:"【新補】原表完全未收錄此產品！機動利率依本行月調整房貸利率指數加碼1.26%起，是安泰的第二個、利率較高的房貸產品。" },
-
-  { id:"fubon_first", bank:"富邦人壽", name:"首購戶(名下無房無貸)", rate1:2.50, rate1Years:40, rate2:2.50, grace:3, term:40, ltvMax:80, ltvNote:"鑑價75成或買價8成孰低，本工具採較高的8成試算，實際依孰低認定可能較保守", fee:"開辦費2,000+鑑價費4,000=6,000元", penalty:"3年內不能塗銷(可大額還款)", asOf:"2026.03.27", rec:false, conditions:"申貸40年需年齡40歲以下且薪資扣繳憑單100萬以上，否則最長僅30年。" },
-  { id:"fubon_general_nowc", bank:"富邦人壽", name:"央行一般戶(有房無購屋貸款亦無週轉金貸款)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"鑑價75成或買價8成孰低，本工具採較高的8成試算", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【修正】原表誤植年限為40年，DM明定僅首購戶可貸40年，此類最長30年。無寬限期。" },
-  { id:"fubon_general_wc", bank:"富邦人壽", name:"央行一般戶(有房無購屋貸款但有週轉金貸款)", rate1:2.70, rate1Years:30, rate2:2.70, grace:0, term:30, ltvMax:75, ltvNote:"不超過鑑價或買價75成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【新補】原表完全未收錄此中間級距。" },
-  { id:"fubon_second", bank:"富邦人壽", name:"央行受限戶(二房)", rate1:2.80, rate1Years:30, rate2:2.80, grace:0, term:30, ltvMax:60, ltvNote:"不超過鑑價或買價6成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"受央行二房規範，成數降至6成。" },
-  { id:"fubon_control", bank:"富邦人壽", name:"央行管制戶(三房以上)/高價戶", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:30, ltvNote:"不超過鑑價或買價3成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【新補】原表完全未收錄此最高級距，成數僅3成。此DM僅供建商報價使用。" }
-];
-
-const state = {};
-bankData.forEach(p => {
-  state[p.id] = { rate1: p.rate1, rate2: p.rate2, term: p.term, grace: p.grace, ltv: p.ltvMax, selected: false };
-});
-
-let personalLoans = [];
-let loanIdCounter = 1;
-
-const fmt = n => new Intl.NumberFormat('zh-TW').format(Math.round(n));
-
-function calculateMonthly(P, termYears, graceYears, rate1, rate1Years, rate2, youthStepUp) {
-  const termMonths = termYears * 12;
-  const graceMonths = graceYears * 12;
-  const rate1Months = rate1Years * 12;
-  let balance = P;
-  let accumulatedInterest = 0;
-  let rows = [];
-  for (let m = 1; m <= termMonths; m++) {
-    let currentYear = Math.ceil(m / 12);
-    let currentRate;
-    if (youthStepUp) {
-      if (currentYear <= 3) currentRate = rate1;
-      else if (currentYear === 4) currentRate = rate1 + 0.125;
-      else if (currentYear === 5) currentRate = rate1 + 0.250;
-      else if (currentYear === 6) currentRate = rate1 + 0.375;
-      else currentRate = rate2;
-    } else {
-      currentRate = (m <= rate1Months) ? rate1 : rate2;
-    }
-    currentRate = Math.round(currentRate * 1000) / 1000;
-    let r = currentRate / 100 / 12;
-    let interestPayment = balance * r;
-    let payment = 0, principalPayment = 0;
-    if (m <= graceMonths) {
-      payment = interestPayment;
-      principalPayment = 0;
-    } else {
-      let remainingMonths = termMonths - m + 1;
-      if (r === 0) payment = balance / remainingMonths;
-      else payment = balance * (r * Math.pow(1 + r, remainingMonths)) / (Math.pow(1 + r, remainingMonths) - 1);
-      principalPayment = payment - interestPayment;
-    }
-    accumulatedInterest += interestPayment;
-    balance -= principalPayment;
-    if (balance < 0) balance = 0;
-    rows.push({ month: m, payment, principal: principalPayment, interest: interestPayment, accInterest: accumulatedInterest, balance, rate: currentRate, isGrace: m <= graceMonths });
-  }
-  return rows;
-}
-
-function buildPhases(rows) {
-  let phases = [];
-  rows.forEach(row => {
-    let phaseDesc = row.isGrace ? `寬限期（只繳利息）` : `本息平均攤還`;
-    let last = phases[phases.length - 1];
-    if (!last || last.rate !== row.rate || last.isGrace !== row.isGrace || Math.abs(last.payment - row.payment) > 5) {
-      phases.push({ startMonth: row.month, endMonth: row.month, payment: row.payment, rate: row.rate, isGrace: row.isGrace, desc: phaseDesc });
-    } else {
-      last.endMonth = row.month;
-    }
-  });
-  return phases;
-}
-
-function calcLoanPayment(amountWan, ratePct, years) {
-  const P = amountWan * 10000;
-  const r = ratePct / 100 / 12;
-  const n = years * 12;
-  if (n <= 0) return 0;
-  if (r === 0) return P / n;
-  return P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-}
-
-function personalLoanTotal() {
-  return personalLoans.reduce((sum, l) => sum + calcLoanPayment(l.amount, l.rate, l.years), 0);
-}
-
-function addPersonalLoan() {
-  const name = document.getElementById('loanName').value.trim() || '未命名貸款';
-  const amount = parseFloat(document.getElementById('loanAmt').value || 0);
-  const rate = parseFloat(document.getElementById('loanRate').value || 0);
-  const years = parseFloat(document.getElementById('loanTerm').value || 0);
-  if (amount <= 0 || years <= 0) return;
-  personalLoans.push({ id: loanIdCounter++, name, amount, rate, years });
-  document.getElementById('loanName').value = '';
-  renderPersonalLoans();
-  renderCompare();
-}
-
-function removePersonalLoan(id) {
-  personalLoans = personalLoans.filter(l => l.id !== id);
-  renderPersonalLoans();
-  renderCompare();
-}
-
-function renderPersonalLoans() {
-  const list = document.getElementById('loanList');
-  list.innerHTML = '';
-  personalLoans.forEach(l => {
-    const payment = calcLoanPayment(l.amount, l.rate, l.years);
-    const item = document.createElement('div');
-    item.className = 'loan-item';
-    item.innerHTML = `
-      <span class="li-name">${l.name}</span>
+	const bankData = [
+		{ id:"youth_taiwan", bank:"公股銀行聯合(臺銀/一銀/合庫/彰銀)", name:"青年安心成家專案(2.0，7/31前送件適用)", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"依各承作銀行規範，約最高8成", fee:"開辦費按核貸金額千分之1計收，最低5,000元（以臺灣銀行條件為準，各承作銀行費用略有差異）", penalty:"多數配合銀行不綁約，可提前還本免違約金", asOf:"112.08.01-115.07.31補貼期", rec:false, youthStepUp:true, conditions:"本人配偶及未成年子女均無自有住宅。注意：2026/8/1起改為青安3.0，新增未滿50歲、本人年所得200萬以下、房屋總價上限(北市3500萬/新北竹2500萬/其他2000萬)等資格限制，7/31前送件才適用本列2.0規則。" },
+		{ id:"changhwa_youth_step", bank:"彰化銀行", name:"青年首次購屋優惠貸款(階段式)", rate1:2.065, rate1Years:2, rate2:2.365, grace:5, term:40, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範，無寬限期", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償全部或部分還款，不收取違約金", asOf:"115.05.05", rec:false, conditions:"第1~2年2.065%起，第3年起2.365%起。利息補貼0.5%至115/7/31止（補貼期間最低1.565%起）。與台銀等公股行版本(1.775%/2.275%)是不同計算路徑，實際送件以受理銀行公告為準。" },
+		
+		{ id:"taiwan_pub_first", bank:"臺灣銀行", name:"築巢優利貸(公教首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:5, term:40, ltvMax:85, ltvNote:"最高8.5成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購(含與他人共購)，名下無自用住宅。" },
+		{ id:"taiwan_pub_nonfirst", bank:"臺灣銀行", name:"築巢優利貸(公教非首購)", rate1:2.185, rate1Years:40, rate2:2.185, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費0元、開辦費0元", penalty:"不綁約，可額外還本，不計收違約金", asOf:"未標示，郵匯局2年期定儲1.72%", rec:false, conditions:"公教員工或其配偶所購，名下有房無貸款，無寬限期。" },
+		{ id:"taiwan_first", bank:"臺灣銀行", name:"一般首購(名下無自用住宅)", rate1:2.585, rate1Years:40, rate2:2.585, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"徵信費每人300元、開辦費千分之1(最低5,000元)", penalty:"不綁約，可額外還本，不計收違約金", asOf:"本行定儲利率指數1.751%", rec:false, conditions:"借款人名下無自有住宅，需「全國財產稅總歸戶財產查詢清單」佐證。" },
+		
+		{ id:"first_bank_home_qualify", bank:"第一銀行", name:"自用住宅貸款(符合公教/年所得80萬+)", rate1:2.50, rate1Years:40, rate2:2.50, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金，3年後可隨時提前還款免違約金", asOf:"115.04.15", rec:false, conditions:"【修正】原表誤標為「首購專案」，DM實際分類是自用/非自用住宅，非首購/非首購。借戶符合公教資格或年所得80萬(含)以上，或借保戶合計100萬以上。另有40年專案需洽消金專員，DM未載明寬限期年數。" },
+		{ id:"first_bank_home_notqualify", bank:"第一銀行", name:"自用住宅貸款(不符合上述資格)", rate1:2.53, rate1Years:40, rate2:2.53, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金，3年後可隨時提前還款免違約金", asOf:"115.04.15", rec:false, conditions:"【新補】原表完全未收錄。不符合公教/年所得資格者適用此較高利率。" },
+		{ id:"first_bank_nonhome_qualify", bank:"第一銀行", name:"非自用住宅貸款(符合資格)", rate1:2.65, rate1Years:40, rate2:2.65, grace:0, term:30, ltvMax:80, ltvNote:"最高8成，店舖另計最長20年、利率加0.15%", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金", asOf:"115.04.15", rec:false, conditions:"【修正】原表誤標為「非首購」。借戶符合公教資格或年所得100萬以上，或借保戶合計120萬以上。" },
+		{ id:"first_bank_nonhome_notqualify", bank:"第一銀行", name:"非自用住宅貸款(不符合資格)", rate1:2.75, rate1Years:40, rate2:2.75, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費千分之1.5(最低5,000元)、徵信費每人300元", penalty:"3年內申請塗銷抵押權收取遞減式違約金", asOf:"115.04.15", rec:false, conditions:"【新補】原表完全未收錄。不符合公教/年所得資格者適用此較高利率。" },
+		
+		{ id:"coop_first", bank:"合作金庫", name:"首購戶", rate1:2.50, rate1Years:40, rate2:2.50, grace:3, term:40, ltvMax:80, ltvNote:"報稅所得70萬以上者最高8成，其他最高7成", fee:"開辦費千分之1(最高收取10,000元)、信用查詢費300元/人", penalty:"需綁約3年，3年內塗銷抵押權收提前清償違約金", asOf:"115.06.17", rec:false, conditions:"名下無房且無房貸。" },
+		
+		{ id:"changhwa_prime_first", bank:"彰化銀行", name:"尊爵方案(首購)", rate1:2.60, rate1Years:40, rate2:2.60, grace:5, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範辦理", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"公教人員或尊爵客戶(會計師/律師/建築師/醫師/保險經紀人/地政士等)、私立學校或上市櫃年所得70萬以上、或借保合計年收入100萬以上。" },
+		{ id:"changhwa_prime_nonfirst", bank:"彰化銀行", name:"尊爵方案(非首購)", rate1:2.85, rate1Years:40, rate2:2.85, grace:5, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶依規範辦理", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。同尊爵資格，非首購適用此利率。" },
+		{ id:"changhwa_elite_first", bank:"彰化銀行", name:"菁英方案(首購)", rate1:2.70, rate1Years:40, rate2:2.70, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"本行/他行薪轉戶且任職滿一年以上，或借保合計年收入70萬以上。" },
+		{ id:"changhwa_elite_nonfirst", bank:"彰化銀行", name:"菁英方案(非首購)", rate1:2.87, rate1Years:40, rate2:2.87, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。同菁英資格，非首購適用此利率。" },
+		{ id:"changhwa_basic_first", bank:"彰化銀行", name:"小資方案(首購)", rate1:2.80, rate1Years:40, rate2:2.80, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"非屬上述兩方案之借款人。" },
+		{ id:"changhwa_basic_nonfirst", bank:"彰化銀行", name:"小資方案(非首購)", rate1:2.90, rate1Years:40, rate2:2.90, grace:5, term:30, ltvMax:80, ltvNote:"最高8成", fee:"信用查詢費300元/人，帳戶管理費依額度0.15%", penalty:"可提前清償不收違約金", asOf:"114.01.15", rec:false, conditions:"【新補】原表完全未收錄。非首購適用此利率。" },
+		
+		{ id:"yuanta_first_80", bank:"元大銀行", name:"首購(年收入80萬以上)", rate1:2.50, rate1Years:30, rate2:2.50, grace:3, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"年收入80萬(含)以上適用。寬限期限首購戶。" },
+		{ id:"yuanta_first_50", bank:"元大銀行", name:"首購(年收入50萬以上)", rate1:2.58, rate1Years:30, rate2:2.58, grace:3, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【新補】原表完全未收錄。年收入50萬(含)以上、未達80萬適用。" },
+		{ id:"yuanta_nonfirst_80", bank:"元大銀行", name:"非首購(年收入80萬以上)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【修正】原表寬限期誤植為3年。年收入80萬(含)以上。DM寬限期僅限首購戶，非首購應為0年。" },
+		{ id:"yuanta_nonfirst_50", bank:"元大銀行", name:"非首購(年收入50萬以上)", rate1:2.68, rate1Years:30, rate2:2.68, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(依買賣合約價或本行鑑價淨值孰低)", fee:"NT$6,500元", penalty:"限制清償期1年", asOf:"115.05.25", rec:false, conditions:"【新補】原表完全未收錄。年收入50萬(含)以上、未達80萬。非首購無寬限期。" },
+		
+		{ id:"ctbc_first", bank:"中國信託", name:"自用住宅(首購)", rate1:2.50, rate1Years:30, rate2:2.50, grace:3, term:30, ltvMax:85, ltvNote:"最高85成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:true, conditions:"名下無房無貸。成數最高推薦！" },
+		{ id:"ctbc_nonfirst", bank:"中國信託", name:"自用住宅(有房無貸)", rate1:2.60, rate1Years:30, rate2:2.60, grace:3, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【修正】原表寬限期誤植為0年。DM寬限期最長3年是「自用住宅專案」共用條件，非僅首購獨有。" },
+		{ id:"ctbc_shop", bank:"中國信託", name:"店面/一般事務所", rate1:2.70, rate1Years:20, rate2:2.70, grace:0, term:20, ltvMax:70, ltvNote:"最高7成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。貸款年限最長20年，無寬限期。" },
+		{ id:"ctbc_control2", bank:"中國信託", name:"央行管制戶(2房貸款)", rate1:2.70, rate1Years:30, rate2:2.70, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。含本筆已有2戶房貸。" },
+		{ id:"ctbc_control3", bank:"中國信託", name:"央行管制戶(3房貸款)", rate1:2.80, rate1Years:30, rate2:2.80, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費10,000元", penalty:"綁約3年", asOf:"未標示", rec:false, conditions:"【新補】原表完全未收錄。含本筆已有3戶以上房貸。" },
+		
+		{ id:"scsb_general", bank:"上海商銀", name:"一般專案", rate1:2.48, rate1Years:30, rate2:2.48, grace:0, term:30, ltvMax:80, ltvNote:"最高8成(買賣價或估價孰低)", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:true, conditions:"扣除公設面積後坪數<15坪，利率另加0.2%。利率最低推薦！" },
+		{ id:"scsb_control1", bank:"上海商銀", name:"央行控管第一戶", rate1:2.52, rate1Years:30, rate2:2.52, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"坪數<15坪另加0.2%。" },
+		{ id:"scsb_control2", bank:"上海商銀", name:"央行控管第二戶", rate1:2.575, rate1Years:30, rate2:2.575, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"【新補】原表完全未收錄。成數明顯下降至6成，請留意自備款壓力。" },
+		{ id:"scsb_control3", bank:"上海商銀", name:"央行控管第三戶", rate1:2.695, rate1Years:30, rate2:2.695, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費3,000元", penalty:"綁約3年", asOf:"115.06.23", rec:false, conditions:"【新補】原表完全未收錄。成數僅3成，多為第三戶(含)以上適用。" },
+		
+		{ id:"farmer_first", bank:"板橋區農會", name:"首購", rate1:2.52, rate1Years:30, rate2:2.52, grace:3, term:30, ltvMax:80, ltvNote:"最高8成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"DM僅標示「有」寬限期，未載明確切年數，此處採合理估算3年，實際請洽承辦人員確認。" },
+		{ id:"farmer_nonfirst", bank:"板橋區農會", name:"非首購(名下有房無貸款)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"最高8成，央行管制戶最高6成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"無寬限期。" },
+		{ id:"farmer_second", bank:"板橋區農會", name:"第二戶", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:80, ltvNote:"央行管制戶最高6成，其餘最高8成", fee:"作業費及徵信查詢費6,000元", penalty:"無違約金", asOf:"未標示，月指標利率1.71%", rec:false, conditions:"【新補】原表完全未收錄此選項。" },
+		
+		{ id:"obank_first", bank:"王道銀行", name:"首購", rate1:2.58, rate1Years:30, rate2:2.58, grace:2, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"登記一般事務所以上利率+0.1%。" },
+		{ id:"obank_nonfirst", bank:"王道銀行", name:"非首購(名下有房無貸款)", rate1:2.78, rate1Years:30, rate2:2.78, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"無寬限期。" },
+		{ id:"obank_control2", bank:"王道銀行", name:"央行管制戶(購屋貸款第二戶)", rate1:2.88, rate1Years:30, rate2:2.88, grace:0, term:30, ltvMax:60, ltvNote:"最高6成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"【新補】原表未收錄。" },
+		{ id:"obank_control3", bank:"王道銀行", name:"央行管制戶(購屋貸款第三戶)", rate1:2.98, rate1Years:30, rate2:2.98, grace:0, term:30, ltvMax:30, ltvNote:"最高3成", fee:"開辦費7,800元", penalty:"1~12期1.5%、13~24期1%、25~36期0.5%(遞減式)", asOf:"2026.03.23", rec:false, conditions:"【新補】原表未收錄。" },
+		
+		{ id:"taichung_first", bank:"台中銀行", name:"房貸(首購)", rate1:2.68, rate1Years:30, rate2:2.68, grace:3, term:30, ltvMax:75, ltvNote:"最高7.5成", fee:"貸放金額0.15%(最低10,000元)", penalty:"限制清償24個月，前12月1%/13~24月0.8%", asOf:"113.04.21(已逾2年，數字可能過時，務必再次向行員確認)", rec:false, conditions:"借款人名下無自有住宅。" },
+		{ id:"taichung_nonfirst", bank:"台中銀行", name:"房貸(非首購)", rate1:3.50, rate1Years:30, rate2:3.50, grace:0, term:30, ltvMax:80, ltvNote:"最高8成", fee:"貸放金額0.15%(最低10,000元)", penalty:"限制清償24個月，前12月1%/13~24月0.8%", asOf:"113.04.21(已逾2年，數字可能過時)", rec:false, conditions:"【新補】原表完全未收錄，非首購利率比首購高出0.82個百分點，落差很大，無寬限期。" },
+		{ id:"taichung_second_lien", bank:"台中銀行", name:"二順位房貸(本行)", rate1:3.80, rate1Years:15, rate2:3.80, grace:0, term:15, ltvMax:85, ltvNote:"最高8.5成", fee:"最低9,000元", penalty:"限制清償18個月，前6月3%/7~12月2%/13~18月1%", asOf:"113.04.21(已逾2年，數字可能過時)", rec:false, conditions:"【新補】原表完全未收錄，年限僅15年、無寬限期，月付壓力較大。" },
+		
+		{ id:"entie_easy", bank:"安泰銀行", name:"輕鬆買房圓滿成家", rate1:2.75, rate1Years:30, rate2:2.75, grace:0, term:30, ltvMax:80, ltvNote:"DM未標示成數，暫以8成試算，請洽詢實際核准成數", fee:"總費用範例約3,000元起", penalty:"DM未標示，需洽詢", asOf:"115.06.05", rec:false, conditions:"機動利率依本行月調整房貸利率指數加碼1.01%起。" },
+		{ id:"entie_anxin", bank:"安泰銀行", name:"安心入宅時亨運泰", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:80, ltvNote:"DM未標示成數，暫以8成試算，請洽詢實際核准成數", fee:"總費用範例約3,000元起", penalty:"DM未標示，需洽詢", asOf:"115.06.05", rec:false, conditions:"【新補】原表完全未收錄此產品！機動利率依本行月調整房貸利率指數加碼1.26%起，是安泰的第二個、利率較高的房貸產品。" },
+		
+		{ id:"fubon_first", bank:"富邦人壽", name:"首購戶(名下無房無貸)", rate1:2.50, rate1Years:40, rate2:2.50, grace:3, term:40, ltvMax:80, ltvNote:"鑑價75成或買價8成孰低，本工具採較高的8成試算，實際依孰低認定可能較保守", fee:"開辦費2,000+鑑價費4,000=6,000元", penalty:"3年內不能塗銷(可大額還款)", asOf:"2026.03.27", rec:false, conditions:"申貸40年需年齡40歲以下且薪資扣繳憑單100萬以上，否則最長僅30年。" },
+		{ id:"fubon_general_nowc", bank:"富邦人壽", name:"央行一般戶(有房無購屋貸款亦無週轉金貸款)", rate1:2.60, rate1Years:30, rate2:2.60, grace:0, term:30, ltvMax:80, ltvNote:"鑑價75成或買價8成孰低，本工具採較高的8成試算", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【修正】原表誤植年限為40年，DM明定僅首購戶可貸40年，此類最長30年。無寬限期。" },
+		{ id:"fubon_general_wc", bank:"富邦人壽", name:"央行一般戶(有房無購屋貸款但有週轉金貸款)", rate1:2.70, rate1Years:30, rate2:2.70, grace:0, term:30, ltvMax:75, ltvNote:"不超過鑑價或買價75成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【新補】原表完全未收錄此中間級距。" },
+		{ id:"fubon_second", bank:"富邦人壽", name:"央行受限戶(二房)", rate1:2.80, rate1Years:30, rate2:2.80, grace:0, term:30, ltvMax:60, ltvNote:"不超過鑑價或買價6成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"受央行二房規範，成數降至6成。" },
+		{ id:"fubon_control", bank:"富邦人壽", name:"央行管制戶(三房以上)/高價戶", rate1:3.00, rate1Years:30, rate2:3.00, grace:0, term:30, ltvMax:30, ltvNote:"不超過鑑價或買價3成", fee:"開辦費6,000元", penalty:"3年內不能塗銷", asOf:"2026.03.27", rec:false, conditions:"【新補】原表完全未收錄此最高級距，成數僅3成。此DM僅供建商報價使用。" }
+	];
+	
+	const state = {};
+	bankData.forEach(p => {
+		state[p.id] = { rate1: p.rate1, rate2: p.rate2, term: p.term, grace: p.grace, ltv: p.ltvMax, selected: false };
+	});
+	
+	let personalLoans = [];
+	let loanIdCounter = 1;
+	
+	const fmt = n => new Intl.NumberFormat('zh-TW').format(Math.round(n));
+	
+	function calculateMonthly(P, termYears, graceYears, rate1, rate1Years, rate2, youthStepUp) {
+		const termMonths = termYears * 12;
+		const graceMonths = graceYears * 12;
+		const rate1Months = rate1Years * 12;
+		let balance = P;
+		let accumulatedInterest = 0;
+		let rows = [];
+		for (let m = 1; m <= termMonths; m++) {
+			let currentYear = Math.ceil(m / 12);
+			let currentRate;
+			if (youthStepUp) {
+				if (currentYear <= 3) currentRate = rate1;
+				else if (currentYear === 4) currentRate = rate1 + 0.125;
+				else if (currentYear === 5) currentRate = rate1 + 0.250;
+				else if (currentYear === 6) currentRate = rate1 + 0.375;
+				else currentRate = rate2;
+			} else {
+				currentRate = (m <= rate1Months) ? rate1 : rate2;
+			}
+			currentRate = Math.round(currentRate * 1000) / 1000;
+			let r = currentRate / 100 / 12;
+			let interestPayment = balance * r;
+			let payment = 0, principalPayment = 0;
+			if (m <= graceMonths) {
+				payment = interestPayment;
+				principalPayment = 0;
+			} else {
+				let remainingMonths = termMonths - m + 1;
+				if (r === 0) payment = balance / remainingMonths;
+				else payment = balance * (r * Math.pow(1 + r, remainingMonths)) / (Math.pow(1 + r, remainingMonths) - 1);
+				principalPayment = payment - interestPayment;
+			}
+			accumulatedInterest += interestPayment;
+			balance -= principalPayment;
+			if (balance < 0) balance = 0;
+			rows.push({ month: m, payment, principal: principalPayment, interest: interestPayment, accInterest: accumulatedInterest, balance, rate: currentRate, isGrace: m <= graceMonths });
+		}
+		return rows;
+	}
+	
+	function buildPhases(rows) {
+		let phases = [];
+		rows.forEach(row => {
+			let phaseDesc = row.isGrace ? `寬限期（只繳利息）` : `本息平均攤還`;
+			let last = phases[phases.length - 1];
+			if (!last || last.rate !== row.rate || last.isGrace !== row.isGrace || Math.abs(last.payment - row.payment) > 5) {
+				phases.push({ startMonth: row.month, endMonth: row.month, payment: row.payment, rate: row.rate, isGrace: row.isGrace, desc: phaseDesc });
+			} else {
+				last.endMonth = row.month;
+			}
+		});
+		return phases;
+	}
+	
+	function calcLoanPayment(amountWan, ratePct, years) {
+		const P = amountWan * 10000;
+		const r = ratePct / 100 / 12;
+		const n = years * 12;
+		if (n <= 0) return 0;
+		if (r === 0) return P / n;
+		return P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+	}
+	
+	function unboundLoanTotal() {
+		return personalLoans.filter(l => !l.bank).reduce((sum, l) => sum + calcLoanPayment(l.amount, l.rate, l.years), 0);
+	}
+	
+	function loanTotalForBank(bankName) {
+		return personalLoans
+		.filter(l => !l.bank || l.bank === bankName)
+		.reduce((sum, l) => sum + calcLoanPayment(l.amount, l.rate, l.years), 0);
+	}
+	
+	function loansForBank(bankName) {
+		return personalLoans.filter(l => !l.bank || l.bank === bankName);
+	}
+	
+	function populateLoanBankSelect() {
+		const sel = document.getElementById('loanBank');
+		const banks = [...new Set(bankData.map(p => p.bank))];
+		sel.innerHTML = '<option value="">不限定（套用到所有比較方案）</option>' +
+			banks.map(b => `<option value="${b}">${b}</option>`).join('');
+	}
+	
+	function addPersonalLoan() {
+		const name = document.getElementById('loanName').value.trim() || '未命名貸款';
+		const amount = parseFloat(document.getElementById('loanAmt').value || 0);
+		const rate = parseFloat(document.getElementById('loanRate').value || 0);
+		const years = parseFloat(document.getElementById('loanTerm').value || 0);
+		const bank = document.getElementById('loanBank').value;
+		if (amount <= 0 || years <= 0) return;
+		personalLoans.push({ id: loanIdCounter++, name, amount, rate, years, bank });
+		document.getElementById('loanName').value = '';
+		renderPersonalLoans();
+		renderCompare();
+	}
+	
+	function removePersonalLoan(id) {
+		personalLoans = personalLoans.filter(l => l.id !== id);
+		renderPersonalLoans();
+		renderCompare();
+	}
+	
+	function renderPersonalLoans() {
+		const list = document.getElementById('loanList');
+		list.innerHTML = '';
+		personalLoans.forEach(l => {
+			const payment = calcLoanPayment(l.amount, l.rate, l.years);
+			const item = document.createElement('div');
+			item.className = 'loan-item';
+			item.innerHTML = `
+      <span class="li-name">${l.name}${l.bank ? `<span class="loan-bank-badge">綁定：${l.bank}</span>` : `<span class="loan-bank-badge">不限定</span>`}</span>
       <span class="li-detail">${fmt(l.amount)} 萬元・年利率 ${l.rate}%・${l.years} 年</span>
       <span class="li-payment">${fmt(payment)} 元/月</span>
       <button class="del-btn" onclick="removePersonalLoan(${l.id})">刪除</button>
     `;
-    list.appendChild(item);
-  });
-  const total = personalLoanTotal();
-  const wrap = document.getElementById('loanTotalWrap');
-  if (personalLoans.length > 0) {
-    wrap.style.display = 'flex';
-    document.getElementById('loanTotalVal').textContent = fmt(total) + ' 元';
-  } else {
-    wrap.style.display = 'none';
-  }
-}
-
-function getPlanResult(plan) {
-  const s = state[plan.id];
-  const housePrice = parseFloat(document.getElementById('housePrice').value || 0) * 10000;
-  const P = housePrice * (s.ltv / 100);
-  const applyOverride = document.getElementById('applyOverride').checked;
-  const ot = document.getElementById('overrideTerm').value;
-  const og = document.getElementById('overrideGrace').value;
-  let term = s.term, grace = s.grace;
-  if (applyOverride) {
-    if (ot) term = parseFloat(ot);
-    if (og !== '') grace = parseFloat(og);
-  }
-  const rows = calculateMonthly(P, term, grace, s.rate1, plan.rate1Years, s.rate2, plan.youthStepUp);
-  const firstPayment = rows[0] ? rows[0].payment : 0;
-  const postGraceRow = rows.find(r => !r.isGrace) || rows[rows.length - 1];
-  const totalInterest = rows.length ? rows[rows.length - 1].accInterest : 0;
-  const totalPayment = P + totalInterest;
-  return { firstPayment, postGracePayment: postGraceRow ? postGraceRow.payment : firstPayment, totalInterest, totalPayment, term, grace, P, rows };
-}
-
-function renderPhaseDetailInto(container, plan, res) {
-  const phases = buildPhases(res.rows);
-  let phaseHtml = phases.map(ph => {
-    const sy = Math.floor((ph.startMonth - 1) / 12) + 1;
-    const ey = Math.ceil(ph.endMonth / 12);
-    const periodLabel = ph.startMonth === ph.endMonth ? `第 ${ph.startMonth} 期` : `第 ${ph.startMonth}~${ph.endMonth} 期`;
-    const yearLabel = sy === ey ? `約第 ${sy} 年` : `約第 ${sy}~${ey} 年`;
-    return `<tr>
+			list.appendChild(item);
+		});
+		const total = unboundLoanTotal();
+		const wrap = document.getElementById('loanTotalWrap');
+		if (personalLoans.length > 0) {
+			wrap.style.display = 'flex';
+			document.getElementById('loanTotalVal').textContent = fmt(total) + ' 元';
+		} else {
+			wrap.style.display = 'none';
+		}
+	}
+	
+	function getPlanResult(plan) {
+		const s = state[plan.id];
+		const housePrice = parseFloat(document.getElementById('housePrice').value || 0) * 10000;
+		const P = housePrice * (s.ltv / 100);
+		const applyOverride = document.getElementById('applyOverride').checked;
+		const ot = document.getElementById('overrideTerm').value;
+		const og = document.getElementById('overrideGrace').value;
+		let term = s.term, grace = s.grace;
+		if (applyOverride) {
+			if (ot) term = parseFloat(ot);
+			if (og !== '') grace = parseFloat(og);
+		}
+		const rows = calculateMonthly(P, term, grace, s.rate1, plan.rate1Years, s.rate2, plan.youthStepUp);
+		const firstPayment = rows[0] ? rows[0].payment : 0;
+		const postGraceRow = rows.find(r => !r.isGrace) || rows[rows.length - 1];
+		const totalInterest = rows.length ? rows[rows.length - 1].accInterest : 0;
+		const totalPayment = P + totalInterest;
+		return { firstPayment, postGracePayment: postGraceRow ? postGraceRow.payment : firstPayment, totalInterest, totalPayment, term, grace, P, rows };
+	}
+	
+	function renderPhaseDetailInto(container, plan, res) {
+		const phases = buildPhases(res.rows);
+		let phaseHtml = phases.map(ph => {
+			const sy = Math.floor((ph.startMonth - 1) / 12) + 1;
+			const ey = Math.ceil(ph.endMonth / 12);
+			const periodLabel = ph.startMonth === ph.endMonth ? `第 ${ph.startMonth} 期` : `第 ${ph.startMonth}~${ph.endMonth} 期`;
+			const yearLabel = sy === ey ? `約第 ${sy} 年` : `約第 ${sy}~${ey} 年`;
+			return `<tr>
       <td>${periodLabel}</td>
       <td>${yearLabel}</td>
       <td class="desc">${ph.desc}</td>
       <td>${ph.rate}%</td>
       <td>${fmt(ph.payment)} 元</td>
     </tr>`;
-  }).join('');
-  container.innerHTML = `
+		}).join('');
+		container.innerHTML = `
     <div class="detail-summary">
       <div class="item">貸款金額<b>${fmt(res.P)} 元</b></div>
       <div class="item">年限 / 寬限期<b>${res.term} 年 / ${res.grace} 年</b></div>
@@ -670,81 +706,90 @@ function renderPhaseDetailInto(container, plan, res) {
       <div class="item">累計總利息<b>${fmt(res.totalInterest)} 元</b></div>
       <div class="item">總還款金額<b>${fmt(res.totalPayment)} 元</b></div>
     </div>
-    <table class="phase-table">
-      <thead><tr><th>期別</th><th>約當年度</th><th>還款方式</th><th>利率</th><th>每期金額</th></tr></thead>
-      <tbody>${phaseHtml}</tbody>
-    </table>
+    <div style="overflow-x:auto;">
+      <table class="phase-table">
+        <thead><tr><th>期別</th><th>約當年度</th><th>還款方式</th><th>利率</th><th>每期金額</th></tr></thead>
+        <tbody>${phaseHtml}</tbody>
+      </table>
+    </div>
     <button class="csv-btn" onclick="downloadCSV('${plan.id}')">下載完整逐期明細 CSV（每一期，共 ${res.rows.length} 列）</button>
   `;
-}
-
-const openDetails = {};
-const openCardDetails = {};
-
-function toggleDetail(id) {
-  const row = document.getElementById('detail-' + id);
-  const isOpen = row.style.display !== 'none';
-  if (isOpen) {
-    row.style.display = 'none';
-    openDetails[id] = false;
-    return;
-  }
-  row.style.display = '';
-  openDetails[id] = true;
-  const plan = bankData.find(p => p.id === id);
-  const res = getPlanResult(plan);
-  renderPhaseDetailInto(document.getElementById('detail-content-' + id), plan, res);
-}
-
-function toggleCardDetail(id) {
-  const container = document.getElementById('card-detail-' + id);
-  const isOpen = container.style.display !== 'none' && container.innerHTML !== '';
-  if (isOpen) {
-    container.style.display = 'none';
-    container.innerHTML = '';
-    openCardDetails[id] = false;
-    return;
-  }
-  container.style.display = 'block';
-  openCardDetails[id] = true;
-  const plan = bankData.find(p => p.id === id);
-  const res = getPlanResult(plan);
-  renderPhaseDetailInto(container, plan, res);
-}
-
-function downloadCSV(id) {
-  const plan = bankData.find(p => p.id === id);
-  const res = getPlanResult(plan);
-  let csv = '\uFEFF期別,年度,利率(%),還款方式,每期還款金額,本金,利息,累計利息,剩餘本金\n';
-  res.rows.forEach(r => {
-    const year = Math.ceil(r.month / 12);
-    csv += `${r.month},第${year}年,${r.rate},${r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還'},${Math.round(r.payment)},${Math.round(r.principal)},${Math.round(r.interest)},${Math.round(r.accInterest)},${Math.round(r.balance)}\n`;
-  });
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `逐期還款明細_${plan.bank}_${plan.name}.csv`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-function renderTable() {
-  const body = document.getElementById('planBody');
-  body.innerHTML = '';
-  bankData.forEach(plan => {
-    const s = state[plan.id];
-    const res = getPlanResult(plan);
-    const isNew = plan.conditions.indexOf('【新補】') !== -1;
-    const isFixed = plan.conditions.indexOf('【修正】') !== -1;
-    const tr = document.createElement('tr');
-    tr.className = s.selected ? 'selected' : '';
-    tr.innerHTML = `
+	}
+	
+	const openDetails = {};
+	const openCardDetails = {};
+	
+	function toggleDetail(id) {
+		const row = document.getElementById('detail-' + id);
+		const isOpen = row.style.display !== 'none';
+		if (isOpen) {
+			row.style.display = 'none';
+			openDetails[id] = false;
+			return;
+		}
+		row.style.display = '';
+		openDetails[id] = true;
+		const plan = bankData.find(p => p.id === id);
+		const res = getPlanResult(plan);
+		renderPhaseDetailInto(document.getElementById('detail-content-' + id), plan, res);
+	}
+	
+	function toggleCardDetail(id) {
+		const container = document.getElementById('card-detail-' + id);
+		const isOpen = container.style.display !== 'none' && container.innerHTML !== '';
+		if (isOpen) {
+			container.style.display = 'none';
+			container.innerHTML = '';
+			openCardDetails[id] = false;
+			return;
+		}
+		container.style.display = 'block';
+		openCardDetails[id] = true;
+		const plan = bankData.find(p => p.id === id);
+		const res = getPlanResult(plan);
+		renderPhaseDetailInto(container, plan, res);
+	}
+	
+	function downloadCSV(id) {
+		const plan = bankData.find(p => p.id === id);
+		const res = getPlanResult(plan);
+		let csv = '\uFEFF期別,年度,利率(%),還款方式,每期還款金額,本金,利息,累計利息,剩餘本金\n';
+		res.rows.forEach(r => {
+			const year = Math.ceil(r.month / 12);
+			csv += `${r.month},第${year}年,${r.rate},${r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還'},${Math.round(r.payment)},${Math.round(r.principal)},${Math.round(r.interest)},${Math.round(r.accInterest)},${Math.round(r.balance)}\n`;
+		});
+		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `逐期還款明細_${plan.bank}_${plan.name}.csv`;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
+	
+	function renderTable() {
+		const active = document.activeElement;
+		let focusInfo = null;
+		if (active && active.tagName === 'INPUT' && active.dataset && active.dataset.id) {
+			const cls = [...active.classList].find(c => c.endsWith('-input'));
+			if (cls) {
+				focusInfo = { className: cls, id: active.dataset.id, selStart: active.selectionStart, selEnd: active.selectionEnd };
+			}
+		}
+		
+		const body = document.getElementById('planBody');
+		body.innerHTML = '';
+		bankData.forEach(plan => {
+			const s = state[plan.id];
+			const res = getPlanResult(plan);
+			const tr = document.createElement('tr');
+			tr.className = s.selected ? 'selected' : '';
+			tr.innerHTML = `
       <td><input type="checkbox" data-id="${plan.id}" class="sel-check" ${s.selected ? 'checked' : ''}></td>
       <td>
-        <div class="bank-name">${plan.bank}${plan.rec ? '<span class="rec-badge">推薦</span>' : ''}${isNew ? '<span class="new-badge">新補</span>' : ''}${isFixed ? '<span class="new-badge">已修正</span>' : ''}</div>
+        <div class="bank-name">${plan.bank}</div>
         <div class="plan-name">${plan.name}</div>
       </td>
       <td>
@@ -768,86 +813,106 @@ function renderTable() {
       <td class="cond">${plan.conditions}</td>
       <td><button class="detail-btn" data-id="${plan.id}" onclick="toggleDetail('${plan.id}')">查看逐期</button></td>
     `;
-    body.appendChild(tr);
-
-    const detailTr = document.createElement('tr');
-    detailTr.className = 'detail-row';
-    detailTr.id = 'detail-' + plan.id;
-    detailTr.style.display = 'none';
-    detailTr.innerHTML = `<td colspan="11"><div id="detail-content-${plan.id}"></div></td>`;
-    body.appendChild(detailTr);
-  });
-
-  document.querySelectorAll('.sel-check').forEach(el => {
-    el.addEventListener('change', e => {
-      state[e.target.dataset.id].selected = e.target.checked;
-      renderTable();
-      renderCompare();
-    });
-  });
-  document.querySelectorAll('.rate1-input').forEach(el => {
-    el.addEventListener('input', e => { state[e.target.dataset.id].rate1 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-  });
-  document.querySelectorAll('.rate2-input').forEach(el => {
-    el.addEventListener('input', e => { state[e.target.dataset.id].rate2 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-  });
-  document.querySelectorAll('.ltv-input').forEach(el => {
-    el.addEventListener('input', e => { state[e.target.dataset.id].ltv = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-  });
-  document.querySelectorAll('.term-input').forEach(el => {
-    el.addEventListener('input', e => { state[e.target.dataset.id].term = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-  });
-  document.querySelectorAll('.grace-input').forEach(el => {
-    el.addEventListener('input', e => { state[e.target.dataset.id].grace = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
-  });
-
-  Object.keys(openDetails).forEach(id => {
-    if (openDetails[id]) {
-      const row = document.getElementById('detail-' + id);
-      if (row) {
-        row.style.display = '';
-        const plan = bankData.find(p => p.id === id);
-        const res = getPlanResult(plan);
-        renderPhaseDetailInto(document.getElementById('detail-content-' + id), plan, res);
-      }
-    }
-  });
-}
-
-function renderCompare() {
-  const selected = bankData.filter(p => state[p.id].selected);
-  const bar = document.getElementById('compareBar');
-  const section = document.getElementById('compareSection');
-  document.getElementById('selCount').textContent = selected.length;
-
-  if (selected.length === 0) {
-    bar.style.display = 'none';
-    section.style.display = 'none';
-    return;
-  }
-  bar.style.display = 'flex';
-  section.style.display = 'block';
-
-  const results = selected.map(p => ({ plan: p, res: getPlanResult(p) }));
-  const minInterest = Math.min(...results.map(r => r.res.totalInterest));
-  const loanTotal = personalLoanTotal();
-
-  const grid = document.getElementById('compareGrid');
-  grid.innerHTML = '';
-  results.forEach(({ plan, res }) => {
-    const isBest = res.totalInterest === minInterest;
-    const card = document.createElement('div');
-    card.className = 'compare-card' + (isBest ? ' best' : '');
-    let comboHtml = '';
-    if (loanTotal > 0) {
-      comboHtml = `
-        <div class="metric-row combo"><span>+ 信貸／裝潢貸月付</span><span>${fmt(loanTotal)} 元</span></div>
+			body.appendChild(tr);
+			
+			const detailTr = document.createElement('tr');
+			detailTr.className = 'detail-row';
+			detailTr.id = 'detail-' + plan.id;
+			detailTr.style.display = 'none';
+			detailTr.innerHTML = `<td colspan="11"><div id="detail-content-${plan.id}"></div></td>`;
+			body.appendChild(detailTr);
+		});
+		
+		document.querySelectorAll('.sel-check').forEach(el => {
+			el.addEventListener('change', e => {
+				state[e.target.dataset.id].selected = e.target.checked;
+				renderTable();
+				renderCompare();
+			});
+		});
+		document.querySelectorAll('.rate1-input').forEach(el => {
+			el.addEventListener('input', e => { state[e.target.dataset.id].rate1 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		});
+		document.querySelectorAll('.rate2-input').forEach(el => {
+			el.addEventListener('input', e => { state[e.target.dataset.id].rate2 = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		});
+		document.querySelectorAll('.ltv-input').forEach(el => {
+			el.addEventListener('input', e => { state[e.target.dataset.id].ltv = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		});
+		document.querySelectorAll('.term-input').forEach(el => {
+			el.addEventListener('input', e => { state[e.target.dataset.id].term = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		});
+		document.querySelectorAll('.grace-input').forEach(el => {
+			el.addEventListener('input', e => { state[e.target.dataset.id].grace = parseFloat(e.target.value || 0); renderTable(); renderCompare(); });
+		});
+		
+		Object.keys(openDetails).forEach(id => {
+			if (openDetails[id]) {
+				const row = document.getElementById('detail-' + id);
+				if (row) {
+					row.style.display = '';
+					const plan = bankData.find(p => p.id === id);
+					const res = getPlanResult(plan);
+					renderPhaseDetailInto(document.getElementById('detail-content-' + id), plan, res);
+				}
+			}
+		});
+		
+		if (focusInfo) {
+			const newEl = document.querySelector(`.${focusInfo.className}[data-id="${focusInfo.id}"]`);
+			if (newEl) {
+				newEl.focus();
+				if (typeof focusInfo.selStart === 'number') {
+					try { newEl.setSelectionRange(focusInfo.selStart, focusInfo.selEnd); } catch (e) {}
+				}
+			}
+		}
+	}
+	
+	function renderCompare() {
+		const selected = bankData.filter(p => state[p.id].selected);
+		const bar = document.getElementById('compareBar');
+		const section = document.getElementById('compareSection');
+		document.getElementById('selCount').textContent = selected.length;
+		
+		if (selected.length === 0) {
+			bar.style.display = 'none';
+			section.style.display = 'none';
+			return;
+		}
+		bar.style.display = 'flex';
+		section.style.display = 'block';
+		
+		const results = selected.map(p => ({ plan: p, res: getPlanResult(p) }));
+		const minInterest = Math.min(...results.map(r => r.res.totalInterest));
+		const hasLoans = personalLoans.length > 0;
+		const comboFirstList = results.map(({ plan, res }) => res.firstPayment + loanTotalForBank(plan.bank));
+		const minComboFirst = hasLoans ? Math.min(...comboFirstList) : null;
+		
+		const grid = document.getElementById('compareGrid');
+		grid.innerHTML = '';
+		results.forEach(({ plan, res }, idx) => {
+			const isBest = res.totalInterest === minInterest;
+			const bankLoans = loansForBank(plan.bank);
+			const loanTotal = bankLoans.reduce((sum, l) => sum + calcLoanPayment(l.amount, l.rate, l.years), 0);
+			const comboFirst = res.firstPayment + loanTotal;
+			const isComboBest = hasLoans && comboFirst === minComboFirst;
+			const card = document.createElement('div');
+			card.className = 'compare-card' + (isBest ? ' best' : '');
+			let comboHtml = '';
+			if (loanTotal > 0) {
+				const loanNames = bankLoans.map(l => l.name).join('、');
+				comboHtml = `
+        <div class="metric-row combo"><span>+ 信貸／裝潢貸月付（${loanNames}）</span><span>${fmt(loanTotal)} 元</span></div>
         <div class="metric-row combo"><span>房貸+信貸合計(首期)</span><span>${fmt(res.firstPayment + loanTotal)} 元</span></div>
         <div class="metric-row combo"><span>房貸+信貸合計(後期)</span><span>${fmt(res.postGracePayment + loanTotal)} 元</span></div>
       `;
-    }
-    card.innerHTML = `
+			} else if (hasLoans) {
+				comboHtml = `<div class="metric-row combo"><span>此銀行無綁定信貸</span><span>—</span></div>`;
+			}
+			card.innerHTML = `
       ${isBest ? '<div class="tag">總利息最低</div>' : ''}
+      ${isComboBest ? `<div class="tag" style="right:auto;left:14px;background:var(--gold);">含信貸月付最低</div>` : ''}
       <h3>${plan.bank}</h3>
       <div class="plan">${plan.name}</div>
       <div class="metric-row"><span>利率</span><span>${state[plan.id].rate1}%${state[plan.id].rate2 !== state[plan.id].rate1 ? ' → ' + state[plan.id].rate2 + '%' : ''}</span></div>
@@ -864,63 +929,64 @@ function renderCompare() {
       <button class="card-detail-btn" onclick="toggleCardDetail('${plan.id}')">查看逐期明細</button>
       <div class="card-detail-content" id="card-detail-${plan.id}" style="display:none;"></div>
     `;
-    grid.appendChild(card);
-  });
-
-  Object.keys(openCardDetails).forEach(id => {
-    if (openCardDetails[id]) {
-      const container = document.getElementById('card-detail-' + id);
-      if (container) {
-        container.style.display = 'block';
-        const plan = bankData.find(p => p.id === id);
-        if (plan) {
-          const res = getPlanResult(plan);
-          renderPhaseDetailInto(container, plan, res);
-        }
-      }
-    }
-  });
-
-  const allRates = bankData.map(p => state[p.id].rate1);
-  const minRate = Math.min(...allRates);
-  const maxRate = Math.max(...allRates);
-  const ruler = document.getElementById('rateRuler');
-  ruler.innerHTML = '';
-  results.forEach(({ plan }) => {
-    const rate = state[plan.id].rate1;
-    const pct = maxRate === minRate ? 50 : ((rate - minRate) / (maxRate - minRate)) * 100;
-    const pin = document.createElement('div');
-    pin.className = 'ruler-pin';
-    pin.style.left = pct + '%';
-    pin.innerHTML = `<div class="dot"></div><div class="lbl">${plan.bank} ${rate}%</div>`;
-    ruler.appendChild(pin);
-  });
-  document.getElementById('rulerEnds').innerHTML = `<span>${minRate}%（全部方案最低）</span><span>${maxRate}%（全部方案最高）</span>`;
-
-  const maxInterest = Math.max(...results.map(r => r.res.totalInterest));
-  const barsEl = document.getElementById('interestBars');
-  barsEl.innerHTML = '';
-  results.sort((a, b) => a.res.totalInterest - b.res.totalInterest).forEach(({ plan, res }) => {
-    const isBest = res.totalInterest === minInterest;
-    const width = maxInterest === 0 ? 0 : (res.totalInterest / maxInterest) * 100;
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    row.innerHTML = `
+			grid.appendChild(card);
+		});
+		
+		Object.keys(openCardDetails).forEach(id => {
+			if (openCardDetails[id]) {
+				const container = document.getElementById('card-detail-' + id);
+				if (container) {
+					container.style.display = 'block';
+					const plan = bankData.find(p => p.id === id);
+					if (plan) {
+						const res = getPlanResult(plan);
+						renderPhaseDetailInto(container, plan, res);
+					}
+				}
+			}
+		});
+		
+		const allRates = bankData.map(p => state[p.id].rate1);
+		const minRate = Math.min(...allRates);
+		const maxRate = Math.max(...allRates);
+		const ruler = document.getElementById('rateRuler');
+		ruler.innerHTML = '';
+		results.forEach(({ plan }) => {
+			const rate = state[plan.id].rate1;
+			const pct = maxRate === minRate ? 50 : ((rate - minRate) / (maxRate - minRate)) * 100;
+			const pin = document.createElement('div');
+			pin.className = 'ruler-pin';
+			pin.style.left = pct + '%';
+			pin.innerHTML = `<div class="dot"></div><div class="lbl">${plan.bank} ${rate}%</div>`;
+			ruler.appendChild(pin);
+		});
+		document.getElementById('rulerEnds').innerHTML = `<span>${minRate}%（全部方案最低）</span><span>${maxRate}%（全部方案最高）</span>`;
+		
+		const maxInterest = Math.max(...results.map(r => r.res.totalInterest));
+		const barsEl = document.getElementById('interestBars');
+		barsEl.innerHTML = '';
+		results.sort((a, b) => a.res.totalInterest - b.res.totalInterest).forEach(({ plan, res }) => {
+			const isBest = res.totalInterest === minInterest;
+			const width = maxInterest === 0 ? 0 : (res.totalInterest / maxInterest) * 100;
+			const row = document.createElement('div');
+			row.className = 'bar-row';
+			row.innerHTML = `
       <div class="name">${plan.bank}｜${plan.name}</div>
       <div class="bar-track"><div class="bar-fill${isBest ? ' best' : ''}" style="width:${Math.max(width, 8)}%"><span class="bar-val">${fmt(res.totalInterest)} 元</span></div></div>
     `;
-    barsEl.appendChild(row);
-  });
-}
-
-['housePrice', 'overrideTerm', 'overrideGrace', 'applyOverride'].forEach(id => {
-  document.getElementById(id).addEventListener('input', () => { renderTable(); renderCompare(); });
-  document.getElementById(id).addEventListener('change', () => { renderTable(); renderCompare(); });
-});
-
-renderPersonalLoans();
-renderTable();
-renderCompare();
+			barsEl.appendChild(row);
+		});
+	}
+	
+	['housePrice', 'overrideTerm', 'overrideGrace', 'applyOverride'].forEach(id => {
+		document.getElementById(id).addEventListener('input', () => { renderTable(); renderCompare(); });
+		document.getElementById(id).addEventListener('change', () => { renderTable(); renderCompare(); });
+	});
+	
+	populateLoanBankSelect();
+	renderPersonalLoans();
+	renderTable();
+	renderCompare();
 </script>
 </body>
 </html>
