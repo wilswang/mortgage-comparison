@@ -483,6 +483,13 @@
 			<div class="compare-grid" id="compareGrid"></div>
 			
 			<div class="bar-compare">
+				<div class="ruler-label" style="margin-bottom:14px;">逐年月付走勢比較（含綁定信貸的合計月付，每年取當年度金額）</div>
+				<div style="position:relative;height:340px;">
+					<canvas id="trendChart"></canvas>
+				</div>
+			</div>
+			
+			<div class="bar-compare">
 				<div class="ruler-label" style="margin-bottom:14px;">總利息比較（貸款期間內累計利息，未含開辦費等一次性費用與信貸）</div>
 				<div id="interestBars"></div>
 			</div>
@@ -496,6 +503,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
 	const bankData = [
 		{ id:"youth_30", bank:"公股銀行（臺銀/一銀/合庫/彰銀等）", name:"青年安心成家購屋優惠貸款3.0（2026/8/1起適用）", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"最高8成", fee:"依各承作銀行規範，3.0確切開辦費用待各行正式公告，暫沿用2.0時期臺灣銀行標準（千分之1，最低5,000元）試算", penalty:"多數配合銀行不綁約，可提前還本免違約金（沿用2.0慣例，3.0確切規定待公告）", asOf:"行政院115.07.16會議通過公告／財政部說明，非個別銀行DM", rec:false, youthStepUp:true, conditions:"詳細資格門檻、利息補貼機制與注意事項，請參考頁面最上方「青安3.0方案說明」。" },
@@ -932,7 +940,22 @@
 		overviewSheet['!cols'] = Object.keys(overviewRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 12) }));
 		XLSX.utils.book_append_sheet(wb, overviewSheet, '比較總覽');
 		
-		const usedNames = new Set(['比較總覽']);
+		const maxYears = Math.max(...results.map(r => r.res.term));
+		const trendRows = [];
+		for (let year = 1; year <= maxYears; year++) {
+			const row = { '年度': `第${year}年` };
+			results.forEach(({ plan, res }) => {
+				const traj = getYearlyTrajectory(plan, res);
+				const colName = `${plan.bank}_${plan.name}`;
+				row[colName] = year <= traj.length ? Math.round(traj[year - 1]) : '';
+			});
+			trendRows.push(row);
+		}
+		const trendSheet = XLSX.utils.json_to_sheet(trendRows);
+		trendSheet['!cols'] = Object.keys(trendRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 14) }));
+		XLSX.utils.book_append_sheet(wb, trendSheet, '逐年比較(可直接畫圖)');
+		
+		const usedNames = new Set(['比較總覽', '逐年比較(可直接畫圖)']);
 		results.forEach(({ plan, res }) => {
 			const loans = loansForBank(plan.bank);
 			const hasLoans = loans.length > 0;
@@ -1077,6 +1100,66 @@
 		});
 	}
 	
+	let trendChartInstance = null;
+	const CHART_COLORS = ['#0B5D52', '#A9792C', '#1F7A5C', '#A9432E', '#5B655E', '#073F38', '#6B4E13', '#2D6E8E'];
+	
+	function getYearlyTrajectory(plan, res) {
+		const loans = loansForBank(plan.bank);
+		const points = [];
+		for (let year = 1; year <= res.term; year++) {
+			const month = (year - 1) * 12 + 1;
+			const row = res.rows[month - 1];
+			if (!row) break;
+			const loanPayment = loans.reduce((sum, l) => sum + (month <= l.years * 12 ? calcLoanPayment(l.amount, l.rate, l.years) : 0), 0);
+			points.push(row.payment + loanPayment);
+		}
+		return points;
+	}
+	
+	function renderTrendChart(results) {
+		const canvas = document.getElementById('trendChart');
+		if (!canvas) return;
+		if (typeof Chart === 'undefined') {
+			canvas.replaceWith(Object.assign(document.createElement('div'), {
+				className: 'empty-hint',
+				textContent: '圖表元件載入失敗，請確認網路連線可以存取 cdnjs.cloudflare.com。'
+			}));
+			return;
+		}
+		const maxYears = Math.max(...results.map(r => r.res.term));
+		const labels = Array.from({ length: maxYears }, (_, i) => `第${i + 1}年`);
+		const datasets = results.map(({ plan, res }, idx) => ({
+			label: `${plan.bank}｜${plan.name}`,
+			data: getYearlyTrajectory(plan, res),
+			borderColor: CHART_COLORS[idx % CHART_COLORS.length],
+			backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
+			borderWidth: 2,
+			pointRadius: 2,
+			tension: 0,
+			fill: false,
+			spanGaps: false
+		}));
+		
+		if (trendChartInstance) trendChartInstance.destroy();
+		trendChartInstance = new Chart(canvas.getContext('2d'), {
+			type: 'line',
+			data: { labels, datasets },
+			options: {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: { mode: 'index', intersect: false },
+				scales: {
+					y: { ticks: { callback: v => fmt(v) } },
+					x: { ticks: { maxTicksLimit: 20 } }
+				},
+				plugins: {
+					legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } },
+					tooltip: { callbacks: { label: ctx => `${ctx.dataset.label}：${fmt(ctx.parsed.y)} 元` } }
+				}
+			}
+		});
+	}
+	
 	function renderCompare() {
 		const selected = bankData.filter(p => state[p.id].selected);
 		const bar = document.getElementById('compareBar');
@@ -1086,12 +1169,14 @@
 		if (selected.length === 0) {
 			bar.style.display = 'none';
 			section.style.display = 'none';
+			if (trendChartInstance) { trendChartInstance.destroy(); trendChartInstance = null; }
 			return;
 		}
 		bar.style.display = 'flex';
 		section.style.display = 'block';
 		
 		const results = selected.map(p => ({ plan: p, res: getPlanResult(p) }));
+		renderTrendChart(results);
 		const minInterest = Math.min(...results.map(r => r.res.totalInterest));
 		const hasLoans = personalLoans.length > 0;
 		const comboFirstList = results.map(({ plan, res }) => res.firstPayment + loanTotalForBank(plan.bank));
