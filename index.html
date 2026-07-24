@@ -444,7 +444,10 @@
 	
 	<div class="compare-section" id="compareSection" style="display:none;">
 		<div class="panel">
-			<h2><span class="stamp">比</span>方案比較</h2>
+			<h2>
+				<span class="stamp">比</span>方案比較
+				<button class="csv-btn" style="margin-left:auto;" onclick="downloadCompareExcel()">下載完整比較 Excel（所有已選方案＋逐月明細）</button>
+			</h2>
 			
 			<div class="ruler-wrap">
 				<div class="ruler-label">起始利率分布（在全部方案的利率區間中的位置）</div>
@@ -467,6 +470,7 @@
 
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 	const bankData = [
 		{ id:"youth_30", bank:"公股銀行（臺銀/一銀/合庫/彰銀等）", name:"青年安心成家購屋優惠貸款3.0（2026/8/1起適用）", rate1:1.775, rate1Years:3, rate2:2.275, grace:5, term:40, ltvMax:80, ltvNote:"最高8成", fee:"依各承作銀行規範，3.0確切開辦費用待各行正式公告，暫沿用2.0時期臺灣銀行標準（千分之1，最低5,000元）試算", penalty:"多數配合銀行不綁約，可提前還本免違約金（沿用2.0慣例，3.0確切規定待公告）", asOf:"行政院115.07.16會議通過公告／財政部說明，非個別銀行DM", rec:false, youthStepUp:true, conditions:"申辦期間2026/8/1~2029/7/31。資格：借款人申貸時未滿50歲，且申貸年齡+核貸年限≤80；借款人本人年所得總額≤200萬元；房屋總價依縣市分級上限（台北市3,500萬／新北市及新竹縣市2,500萬／其他縣市2,000萬）；一生限貸一次；本人配偶及未成年子女均無自有住宅。一般首購最高貸1,000萬，新婚2年內家庭最高1,200萬，育有未成年子女最高1,500萬。利息補貼採「3+3」機制：前3年優惠後利率1.775%，第4年起每年減碼半碼，第7年起回復原貸款利率2.275%（與2.0機制相同）。3.0已取消二段式機動利率與混合式固定利率選項，僅保留一段式機動利率。此列資料來源為行政院／財政部官方公告，銀行DM是2.0時期製作、尚未更新，實際承作銀行清單與各項費用請以正式上路後各行公告為準。" },
@@ -710,7 +714,8 @@
 		return { firstPayment, postGracePayment: postGraceRow ? postGraceRow.payment : firstPayment, totalInterest, totalPayment, term, grace, P, rows };
 	}
 	
-	function renderPhaseDetailInto(container, plan, res) {
+	function renderPhaseDetailInto(container, plan, res, showCsvButton) {
+		if (showCsvButton === undefined) showCsvButton = true;
 		const loans = loansForBank(plan.bank);
 		const hasLoans = loans.length > 0;
 		const phases = hasLoans ? buildCombinedPhases(res.rows, loans) : buildPhases(res.rows);
@@ -769,7 +774,7 @@
         <tbody>${phaseHtml}</tbody>
       </table>
     </div>
-    <button class="csv-btn" onclick="downloadCSV('${plan.id}')">下載完整逐期明細 CSV（每一期，共 ${res.rows.length} 列）</button>
+    ${showCsvButton ? `<button class="csv-btn" onclick="downloadCSV('${plan.id}')">下載完整逐期明細 CSV（每一期，共 ${res.rows.length} 列）</button>` : ''}
   `;
 	}
 	
@@ -804,7 +809,7 @@
 		openCardDetails[id] = true;
 		const plan = bankData.find(p => p.id === id);
 		const res = getPlanResult(plan);
-		renderPhaseDetailInto(container, plan, res);
+		renderPhaseDetailInto(container, plan, res, false);
 	}
 	
 	function downloadCSV(id) {
@@ -837,6 +842,102 @@
 		a.click();
 		document.body.removeChild(a);
 		URL.revokeObjectURL(url);
+	}
+	
+	function sanitizeSheetName(name) {
+		let s = name.replace(/[:\\\/\?\*\[\]]/g, '');
+		if (s.length > 31) s = s.slice(0, 31);
+		return s || 'Sheet';
+	}
+	
+	function uniqueSheetName(name, used) {
+		let base = sanitizeSheetName(name);
+		let candidate = base;
+		let i = 2;
+		while (used.has(candidate)) {
+			const suffix = '_' + i;
+			candidate = base.slice(0, 31 - suffix.length) + suffix;
+			i++;
+		}
+		used.add(candidate);
+		return candidate;
+	}
+	
+	function downloadCompareExcel() {
+		if (typeof XLSX === 'undefined') {
+			alert('Excel 匯出元件載入失敗，請確認網路連線可以存取 cdnjs.cloudflare.com，或改用個別方案的 CSV 下載。');
+			return;
+		}
+		const selected = bankData.filter(p => state[p.id].selected);
+		if (selected.length === 0) {
+			alert('請先在上方勾選至少一個方案加入比較。');
+			return;
+		}
+		
+		const results = selected.map(p => ({ plan: p, res: getPlanResult(p) }));
+		const wb = XLSX.utils.book_new();
+		
+		const overviewRows = results.map(({ plan, res }) => {
+			const s = state[plan.id];
+			const loans = loansForBank(plan.bank);
+			const loanTotal = loans.reduce((sum, l) => sum + calcLoanPayment(l.amount, l.rate, l.years), 0);
+			const loanNames = loans.map(l => l.name).join('、');
+			return {
+				'銀行': plan.bank,
+				'方案': plan.name,
+				'利率(%)': s.rate2 !== s.rate1 ? `${s.rate1} → ${s.rate2}` : s.rate1,
+				'成數(%)': s.ltv,
+				'貸款金額(元)': Math.round(res.P),
+				'年限(年)': res.term,
+				'寬限期(年)': res.grace,
+				'首期月付(元)': Math.round(res.firstPayment),
+				'後期月付(元)': Math.round(res.postGracePayment),
+				'總利息(元)': Math.round(res.totalInterest),
+				'總還款金額(元)': Math.round(res.totalPayment),
+				'開辦費': plan.fee,
+				'違約金': plan.penalty,
+				'資料基準日': plan.asOf,
+				'綁定信貸': loanNames || '無',
+				'信貸月付(元)': Math.round(loanTotal),
+				'房貸+信貸合計-首期(元)': Math.round(res.firstPayment + loanTotal),
+				'房貸+信貸合計-後期(元)': Math.round(res.postGracePayment + loanTotal)
+			};
+		});
+		const overviewSheet = XLSX.utils.json_to_sheet(overviewRows);
+		overviewSheet['!cols'] = Object.keys(overviewRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 12) }));
+		XLSX.utils.book_append_sheet(wb, overviewSheet, '比較總覽');
+		
+		const usedNames = new Set(['比較總覽']);
+		results.forEach(({ plan, res }) => {
+			const loans = loansForBank(plan.bank);
+			const hasLoans = loans.length > 0;
+			const detailRows = res.rows.map(r => {
+				const year = Math.ceil(r.month / 12);
+				const base = {
+					'期別': r.month,
+					'年度': `第${year}年`,
+					'利率(%)': r.rate,
+					'還款方式': r.isGrace ? '寬限期(只繳利息)' : '本息平均攤還',
+					'房貸月付(元)': Math.round(r.payment),
+					'本金(元)': Math.round(r.principal),
+					'利息(元)': Math.round(r.interest),
+					'累計利息(元)': Math.round(r.accInterest),
+					'剩餘本金(元)': Math.round(r.balance)
+				};
+				if (hasLoans) {
+					const loanPayment = loans.reduce((sum, l) => sum + (r.month <= l.years * 12 ? calcLoanPayment(l.amount, l.rate, l.years) : 0), 0);
+					base['信貸月付(元)'] = Math.round(loanPayment);
+					base['合計月付(元)'] = Math.round(r.payment + loanPayment);
+				}
+				return base;
+			});
+			const sheet = XLSX.utils.json_to_sheet(detailRows);
+			sheet['!cols'] = Object.keys(detailRows[0] || {}).map(k => ({ wch: Math.max(k.length + 2, 10) }));
+			const sheetName = uniqueSheetName(`${plan.bank}_${plan.name}`, usedNames);
+			XLSX.utils.book_append_sheet(wb, sheet, sheetName);
+		});
+		
+		XLSX.writeFile(wb, `房貸方案比較_${selected.length}個方案.xlsx`);
 	}
 	
 	function renderTable() {
@@ -1010,7 +1111,7 @@
 					const plan = bankData.find(p => p.id === id);
 					if (plan) {
 						const res = getPlanResult(plan);
-						renderPhaseDetailInto(container, plan, res);
+						renderPhaseDetailInto(container, plan, res, false);
 					}
 				}
 			}
